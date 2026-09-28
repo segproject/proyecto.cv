@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<title>CV — Costo de Ventas</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg:#0f1117; --surface:#181c27; --surface2:#1e2435;
+  --border:#2a3048; --accent:#3b82f6; --accent2:#6366f1;
+  --red:#ef4444; --green:#22c55e; --yellow:#f59e0b;
+  --text:#e2e8f0; --muted:#64748b;
+  --header-grad:linear-gradient(135deg,#0d1b3e,#1a2a6c,#1e3a8a);
+  --login-grad:linear-gradient(135deg,#0a0f1e 0%,#0d1b3e 50%,#0f1117 100%);
+  --th-bg:#0d1b3e; --th-text:#93c5fd;
+  --today-bg:#1e1b4b; --today-text:#a5b4fc;
+  --cv-bg:#1a1a0a; --total-bg:#0d1b3e; --total-text:#93c5fd; --badge-bg:#1e3a8a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* LOGIN */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:var(--login-grad);}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 32px;width:100%;max-width:380px;box-shadow:0 25px 60px rgba(0,0,0,.5);}
+.login-logo{text-align:center;margin-bottom:28px;}
+.login-logo h1{font-size:1.6rem;font-weight:800;color:var(--text);}
+.login-logo p{font-size:.8rem;color:var(--muted);margin-top:4px;}
+.login-logo .icon{font-size:2.5rem;margin-bottom:8px;}
+.form-group{margin-bottom:16px;}
+.form-group label{font-size:.75rem;color:var(--muted);display:block;margin-bottom:6px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+.form-group input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:8px;font-size:16px;outline:none;transition:border .2s;letter-spacing:.12em;font-weight:600;}
+.form-group input:focus{border-color:var(--accent);}
+.btn-login{width:100%;background:linear-gradient(135deg,#1d4ed8,#4338ca);color:#fff;border:none;padding:12px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;margin-top:8px;}
+.login-error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:7px;padding:9px 12px;font-size:.78rem;margin-top:12px;display:none;text-align:center;}
+
+/* HEADER */
+header{background:var(--header-grad);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+header h1{font-size:1.1rem;font-weight:700;color:#fff;}
+header p{font-size:.68rem;color:#93c5fd;margin-top:1px;}
+.header-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.badge{background:var(--badge-bg);border:1px solid var(--accent);border-radius:6px;padding:3px 9px;font-size:.68rem;color:#93c5fd;display:flex;align-items:center;gap:5px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:background .3s;}
+.dot.on{background:var(--green);box-shadow:0 0 6px var(--green);}
+.dot.err{background:var(--red);}
+.btn-logout{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:6px;font-size:.72rem;cursor:pointer;}
+.btn-logout:hover{color:var(--red);border-color:var(--red);}
+select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:5px 9px;border-radius:6px;font-size:.78rem;}
+
+/* KPI */
+.kpi-strip{display:flex;gap:10px;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.kpi{min-width:130px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 13px;flex:1;}
+.kpi .lbl{font-size:.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.kpi .val{font-size:1.05rem;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums;}
+.kpi .sub{font-size:.63rem;color:var(--muted);margin-top:1px;}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);padding:0 20px;background:var(--surface);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tab{padding:10px 18px;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab:hover:not(.active){color:var(--text);}
+
+/* MAIN */
+main{padding:14px 20px;}
+.section-title{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:8px;}
+.actions{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+button.btn{border:none;border-radius:7px;padding:6px 13px;font-size:.73rem;font-weight:600;cursor:pointer;transition:opacity .15s;min-height:36px;}
+button.btn:hover{opacity:.85;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-danger{background:#7f1d1d;color:#fca5a5;border:1px solid var(--red);}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+
+/* METAS */
+.metas-box{background:linear-gradient(135deg,#0d1b3e,#16213e);border:1px solid var(--accent2);border-radius:11px;padding:14px 18px;margin-bottom:14px;}
+.metas-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+.metas-header h3{font-size:.78rem;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.06em;}
+.metas-edit-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:4px 11px;border-radius:6px;font-size:.7rem;cursor:pointer;}
+.metas-edit-btn:hover{color:var(--text);border-color:var(--accent);}
+.metas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;}
+.meta-card{background:rgba(255,255,255,.03);border-radius:9px;padding:11px 14px;}
+.meta-card .meta-lbl{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.meta-card .meta-val{font-size:1.05rem;font-weight:700;font-variant-numeric:tabular-nums;}
+.meta-card .meta-sub{font-size:.68rem;color:var(--muted);margin-top:3px;}
+.meta-bar-track{background:rgba(255,255,255,.08);border-radius:5px;height:8px;margin-top:8px;overflow:hidden;}
+.meta-bar-fill{height:100%;border-radius:5px;transition:width .4s ease;}
+.meta-faltante{color:#fbbf24;font-weight:700;}
+.meta-cumplida{color:#22c55e;font-weight:700;}
+.metas-empty{font-size:.78rem;color:var(--muted);text-align:center;padding:8px;}
+
+/* OBJETIVOS CV */
+.obj-box{background:linear-gradient(135deg,#0d1b3e,#1a1a0a);border:1px solid var(--accent2);border-radius:11px;padding:14px 18px;margin-bottom:14px;}
+.obj-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.obj-header h3{font-size:.78rem;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.06em;}
+.obj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;}
+.obj-card{background:rgba(255,255,255,.03);border-radius:8px;padding:10px 13px;border-left:3px solid transparent;}
+.obj-card.ok{border-left-color:#22c55e;}
+.obj-card.over{border-left-color:#ef4444;}
+.obj-card.nodata{border-left-color:#475569;}
+.obj-lbl{font-size:.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.obj-val{font-size:.95rem;font-weight:700;font-variant-numeric:tabular-nums;}
+.obj-target{font-size:.65rem;color:var(--muted);margin-top:2px;}
+.obj-badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.62rem;font-weight:700;margin-top:4px;}
+.obj-badge.ok{background:rgba(34,197,94,.15);color:#22c55e;}
+.obj-badge.over{background:rgba(239,68,68,.15);color:#ef4444;}
+.obj-badge.nodata{background:rgba(71,85,105,.15);color:#94a3b8;}
+.obj-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-height:360px;overflow-y:auto;}
+.obj-form-label{font-size:.75rem;color:var(--text);display:flex;align-items:center;font-weight:600;}
+.obj-form-input{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:.82rem;outline:none;width:100%;}
+.obj-form-input:focus{border-color:var(--accent);}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:9px;border:1px solid var(--border);background:var(--surface);margin-bottom:18px;-webkit-overflow-scrolling:touch;}
+table{border-collapse:collapse;width:100%;font-size:.73rem;}
+th{background:var(--th-bg);color:var(--th-text);padding:6px 7px;font-size:.63rem;font-weight:600;letter-spacing:.04em;border-right:1px solid var(--border);border-bottom:2px solid var(--accent2);position:sticky;top:0;z-index:3;white-space:nowrap;text-align:center;}
+th:first-child{text-align:left;position:sticky;left:0;z-index:5;min-width:170px;}
+th.today-h{background:var(--today-bg);color:var(--today-text);}
+th.total-h{border-left:2px solid var(--accent2);min-width:86px;}
+td{border-right:1px solid var(--border);border-bottom:1px solid var(--border);white-space:nowrap;}
+td.sticky{position:sticky;left:0;z-index:2;background:var(--surface);padding:5px 9px;font-weight:700;font-size:.7rem;min-width:170px;max-width:200px;white-space:normal;}
+td.sticky.pct-lbl{font-weight:400;font-size:.63rem;color:var(--muted);font-style:italic;padding-left:18px;background:var(--surface2);}
+td.sticky.cv-lbl{color:var(--yellow);font-weight:800;background:var(--cv-bg);}
+td.val{text-align:right;padding:3px 5px;min-width:68px;}
+td.pct{text-align:right;padding:2px 7px;font-size:.62rem;color:#94a3b8;min-width:68px;font-variant-numeric:tabular-nums;background:var(--surface2);}
+td.cv{text-align:right;padding:5px 7px;font-size:.68rem;font-weight:700;color:var(--yellow);min-width:68px;font-variant-numeric:tabular-nums;background:var(--cv-bg);}
+td.total-td{background:var(--total-bg);color:var(--total-text);font-weight:700;border-left:2px solid var(--accent2);}
+td.today-td{background:rgba(99,102,241,.08)!important;}
+input[type=number]{background:transparent;border:none;text-align:right;width:100%;font-size:.73rem;font-family:inherit;font-variant-numeric:tabular-nums;outline:none;padding:0;color:var(--text);-moz-appearance:textfield;}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+input[type=number]:focus{background:rgba(59,130,246,.1);border-radius:3px;}
+.swipe-hint{display:none;font-size:.68rem;color:var(--muted);text-align:center;padding:5px 0;background:var(--surface2);border-radius:6px;margin-bottom:6px;}
+
+/* GRIDS DE TARJETAS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:20px;}
+.card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.card h3{font-size:.9rem;font-weight:700;margin-bottom:4px;}
+.card .card-sub{font-size:.72rem;color:var(--muted);margin-bottom:10px;font-family:monospace;letter-spacing:.06em;}
+.card .card-actions{display:flex;gap:7px;flex-wrap:wrap;}
+.card .card-obj-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;margin:8px 0 12px;}
+.card .card-obj-row-label{font-size:.62rem;color:var(--muted);padding:3px 0;border-bottom:1px solid var(--border);}
+.card .card-obj-row-val{font-size:.62rem;font-weight:700;color:#a5b4fc;padding:3px 0;border-bottom:1px solid var(--border);text-align:right;}
+
+/* CONSOLIDADO */
+.consolidado-table{width:100%;border-collapse:collapse;font-size:.75rem;}
+.consolidado-table th{background:var(--th-bg);color:var(--th-text);padding:7px 10px;text-align:left;border-bottom:2px solid var(--accent2);white-space:nowrap;border-right:1px solid var(--border);}
+.consolidado-table td{padding:6px 10px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);white-space:nowrap;}
+.consolidado-table tr:hover td{background:var(--surface2);}
+
+/* CV COMPARATIVO */
+.cv-cmp-wrap{overflow-x:auto;border-radius:9px;border:1px solid var(--border);margin-bottom:20px;-webkit-overflow-scrolling:touch;}
+.cv-cmp-table{width:100%;border-collapse:collapse;font-size:.73rem;}
+.cv-cmp-table th{background:var(--th-bg);color:var(--th-text);padding:7px 10px;text-align:center;border-right:1px solid var(--border);border-bottom:2px solid var(--accent2);white-space:nowrap;font-size:.63rem;}
+.cv-cmp-table th:first-child{text-align:left;position:sticky;left:0;z-index:2;min-width:140px;}
+.cv-cmp-table td{padding:5px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);text-align:center;font-variant-numeric:tabular-nums;}
+.cv-cmp-table td:first-child{position:sticky;left:0;background:var(--surface);font-weight:700;font-size:.72rem;text-align:left;z-index:1;}
+.cv-cmp-table tr:hover td{background:var(--surface2);}
+.cv-cmp-table tr:hover td:first-child{background:var(--surface2);}
+.cv-cell-ok{color:#22c55e;font-weight:700;}
+.cv-cell-over{color:#ef4444;font-weight:700;}
+.cv-cell-nodata{color:#475569;}
+
+/* ADMIN PIN BOX */
+.admin-pin-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;}
+.admin-pin-box h3{font-size:.82rem;font-weight:700;margin-bottom:10px;color:#a5b4fc;}
+
+/* FILTRO DE RANGO DE DÍAS */
+.filtro-box{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.filtro-box label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
+.filtro-box input[type=number]{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:6px;font-size:.82rem;width:60px;text-align:center;outline:none;font-variant-numeric:tabular-nums;}
+.filtro-box input[type=number]:focus{border-color:var(--accent);}
+.filtro-sep{color:var(--muted);font-size:.8rem;}
+.filtro-tag{font-size:.7rem;color:#a5b4fc;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);border-radius:5px;padding:2px 8px;margin-left:4px;}
+
+.backup-box{background:linear-gradient(135deg,#0d1b3e,#1a2a6c);border:1px solid var(--accent2);border-radius:11px;padding:16px 20px;margin-bottom:16px;}
+.backup-box h3{font-size:.82rem;font-weight:700;color:#a5b4fc;margin-bottom:6px;}
+.backup-box p{font-size:.72rem;color:var(--muted);margin-bottom:12px;}
+.backup-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.backup-status{font-size:.72rem;margin-top:8px;padding:6px 10px;border-radius:6px;display:none;}
+.backup-status.ok{background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);}
+.backup-status.err{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.3);}
+.backup-status.loading{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.3);}
+#importFileInput{display:none;}
+.import-label{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px 13px;font-size:.73rem;font-weight:600;cursor:pointer;min-height:36px;display:inline-flex;align-items:center;gap:6px;}
+.import-label:hover{border-color:var(--accent);color:var(--accent);}
+
+.zona-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;}
+.zona-card h3{font-size:1rem;font-weight:700;margin-bottom:4px;color:#e2e8f0;}
+.zona-card .zona-pin{font-size:.72rem;color:var(--muted);margin-bottom:6px;font-family:monospace;}
+.zona-card .zona-tiendas{font-size:.72rem;color:#a5b4fc;margin-bottom:12px;}
+.zona-card .zona-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:400px;box-shadow:0 20px 50px rgba(0,0,0,.6);}
+.modal h2{font-size:1rem;font-weight:700;margin-bottom:20px;}
+.modal .form-group{margin-bottom:14px;}
+.modal .form-group label{font-size:.72rem;color:var(--muted);display:block;margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+.modal .form-group input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:7px;font-size:16px;outline:none;}
+.modal .form-group input:focus{border-color:var(--accent);}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+.modal-error{color:#fca5a5;font-size:.73rem;margin-top:8px;display:none;}
+
+/* OVERLAY */
+#loadOverlay{position:fixed;inset:0;background:rgba(15,17,23,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;}
+.spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+footer{text-align:center;padding:10px;font-size:.65rem;color:var(--muted);border-top:1px solid var(--border);}
+
+/* RESPONSIVE */
+.table-wrap{-webkit-overflow-scrolling:touch;}
+@media(max-width:768px){
+  header{padding:10px 14px;}
+  .swipe-hint{display:block;}
+  .header-right{width:100%;justify-content:space-between;}
+  #lastSaved{display:none;}
+  .kpi{min-width:118px;}
+  main{padding:10px 12px;}
+  .modal{max-width:92vw;padding:22px;}
+}
+@media(max-width:480px){
+  .cards-grid{grid-template-columns:1fr;}
+  .actions{flex-direction:column;align-items:stretch;}
+  .actions button.btn{width:100%;}
+}
+@media(hover:none) and (pointer:coarse){
+  .btn-logout,.tab,button.btn{min-height:38px;}
+  select{min-height:38px;}
+}
+</style>
+</head>
+<body>
+
+<div id="loadOverlay"><div class="spinner"></div><p id="loadMsg" style="margin-top:12px;color:var(--muted);font-size:.82rem">Iniciando…</p></div>
+
+<!-- LOGIN -->
+<div id="loginScreen" style="display:none;">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="icon">📊</div>
+      <h1>CV — Costo de Ventas</h1>
+      <p>Ingresa tu código de acceso</p>
+    </div>
+    <div class="form-group">
+      <label>Código / PIN de acceso</label>
+      <input type="password" id="pinInput" placeholder="••••••" maxlength="20" onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Ingresar →</button>
+    <div class="login-error" id="loginError">PIN incorrecto. Intenta de nuevo.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appScreen" style="display:none;">
+  <header>
+    <div>
+      <h1>📊 <span id="headerTitle">CV</span></h1>
+      <p id="headerSub"></p>
+    </div>
+    <div class="header-right">
+      <div class="badge"><div class="dot" id="syncDot"></div><span id="syncLabel">Conectando…</span></div>
+      <span id="lastSaved" style="font-size:.62rem;color:var(--muted)"></span>
+      <select id="yearSel" onchange="changeMonth()" style="min-width:78px"></select>
+      <select id="monthSel" onchange="changeMonth()" style="min-width:110px"></select>
+      <button class="btn-logout" onclick="doLogout()">Cerrar sesión</button>
+    </div>
+  </header>
+  <div class="tabs" id="appTabs" style="display:none;"></div>
+  <div class="kpi-strip" id="kpiStrip"></div>
+  <main id="mainContent"></main>
+  <footer>CV Dashboard · Firebase · GitHub Pages</footer>
+  <input type="file" id="importFileInput" accept=".json" onchange="procesarImportJSON(this)">
+</div>
+
+<!-- MODALES -->
+<div class="modal-overlay" id="modalZona" style="display:none;">
+  <div class="modal">
+    <h2 id="modalZonaTitle">➕ Nueva Zona</h2>
+    <input type="hidden" id="zonaEditId">
+    <div class="form-group"><label>Nombre de la zona</label><input type="text" id="zonaNombre" placeholder="Ej: Zona Norte" maxlength="40"></div>
+    <div class="form-group"><label>PIN del administrador de zona</label><input type="text" id="zonaPin" placeholder="Ej: NORTE01" maxlength="20" style="text-transform:uppercase;font-family:monospace;font-weight:700;letter-spacing:.1em;"></div>
+    <div class="modal-error" id="errorZona"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarZona()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalTienda" style="display:none;">
+  <div class="modal">
+    <h2 id="modalTiendaTitle">➕ Nueva Tienda</h2>
+    <input type="hidden" id="tiendaEditId">
+    <div class="form-group"><label>Nombre de la tienda</label><input type="text" id="tiendaNombre" placeholder="Ej: Real Plaza Chiclayo" maxlength="40"></div>
+    <div class="form-group"><label>PIN de acceso</label><input type="text" id="tiendaPin" placeholder="Ej: CHICLAYO01" maxlength="20" style="text-transform:uppercase;font-family:monospace;font-weight:700;letter-spacing:.1em;"></div>
+    <div class="modal-error" id="errorTienda"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarTienda()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalEliminar" style="display:none;">
+  <div class="modal">
+    <h2>⚠️ Confirmar eliminación</h2>
+    <p id="eliminarMsg" style="color:var(--muted);font-size:.82rem;margin-bottom:16px;"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger" id="eliminarConfirmBtn">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalCambiarPin" style="display:none;">
+  <div class="modal">
+    <h2 id="modalCambiarPinTitle">🔑 Cambiar PIN</h2>
+    <input type="hidden" id="cambiarPinTarget">
+    <div class="form-group" id="pinActualGroup">
+      <label>PIN actual</label>
+      <input type="password" id="pinActual" placeholder="Ingresa el PIN actual" maxlength="20" style="font-family:monospace;font-weight:700;letter-spacing:.1em;">
+    </div>
+    <div class="form-group"><label>Nuevo PIN</label><input type="text" id="pinNuevo" placeholder="Nuevo PIN (mín. 4 caracteres)" maxlength="20" style="text-transform:uppercase;font-family:monospace;font-weight:700;letter-spacing:.1em;"></div>
+    <div class="form-group"><label>Confirmar nuevo PIN</label><input type="text" id="pinNuevoConfirm" placeholder="Repite el nuevo PIN" maxlength="20" style="text-transform:uppercase;font-family:monospace;font-weight:700;letter-spacing:.1em;"></div>
+    <div class="modal-error" id="errorCambiarPin"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="ejecutarCambioPin()">Guardar PIN</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalMeta" style="display:none;">
+  <div class="modal">
+    <h2>🎯 Meta de ventas del mes</h2>
+    <input type="hidden" id="metaTiendaId">
+    <div class="form-group"><label>Meta mensual (S/)</label><input type="number" step="0.01" id="metaMensualInput" placeholder="Ej: 250000"></div>
+    <div class="form-group"><label>Meta diaria (S/) — opcional</label><input type="number" step="0.01" id="metaDiariaInput" placeholder="Se calcula automático si lo dejas vacío"></div>
+    <p style="font-size:.7rem;color:var(--muted);margin-top:-6px;">Si no defines una meta diaria, se divide la meta mensual entre los días del mes.</p>
+    <div class="modal-actions" style="justify-content:space-between;">
+      <button class="btn btn-danger" onclick="eliminarMeta()">🗑 Eliminar</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="guardarMeta()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalObjetivos" style="display:none;">
+  <div class="modal" style="max-width:480px;">
+    <h2>🎯 Objetivos de CV</h2>
+    <input type="hidden" id="objTiendaId">
+    <div id="objFormContent"></div>
+    <p style="font-size:.68rem;color:var(--muted);margin-top:10px;">% máximo por indicador. Deja vacío para no controlar.</p>
+    <div class="modal-error" id="errorObjetivos"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarObjetivos()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig={
+  apiKey:"AIzaSyB_EFI2MMx2l5uvlgabLWwfdqv55bS6dOs",
+  authDomain:"proyecto-cv-2ddde.firebaseapp.com",
+  databaseURL:"https://proyecto-cv-2ddde-default-rtdb.firebaseio.com",
+  projectId:"proyecto-cv-2ddde",
+  storageBucket:"proyecto-cv-2ddde.firebasestorage.app",
+  messagingSenderId:"351929179230",
+  appId:"1:351929179230:web:aa86c18ea4bbb99dfea8cf"
+};
+const fbApp=initializeApp(firebaseConfig);
+const db=getDatabase(fbApp);
+
+// ── Constantes ────────────────────────────────────────────────────────────────
+const PIN_SUPER_ADMIN_DEFAULT="PJ2026";
+const PIN_SUPER_OCULTO="2018";
+const NOMBRES_MESES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const ANIO_MIN=2024,ANIO_MAX=2030;
+const MESES=[];
+for(let y=ANIO_MIN;y<=ANIO_MAX;y++){for(let m=1;m<=12;m++){const ym=y+"-"+String(m).padStart(2,"0");MESES.push([ym,NOMBRES_MESES[m-1]+" "+y]);}}
+const INDICATORS=[
+  {key:"venta",label:"VENTA",isCost:false},
+  {key:"receta",label:"RECETA ( 951 )",isCost:true},
+  {key:"merma",label:"MERMA ( 957, 958 )",isCost:true},
+  {key:"refrigerio",label:"REFRIGERIO (967,968)",isCost:true},
+  {key:"ci",label:"CI ( 975, 976 )",isCost:true},
+  {key:"ajuste",label:"AJUSTE ( 701,702 )",isCost:true},
+  {key:"aej",label:"AEJ ( 955,956 )",isCost:true},
+];
+const COST_INDICATORS=[
+  {key:"receta",label:"Receta ( 951 )"},
+  {key:"merma",label:"Merma ( 957, 958 )"},
+  {key:"refrigerio",label:"Refrigerio (967,968)"},
+  {key:"ci",label:"CI ( 975, 976 )"},
+  {key:"ajuste",label:"Ajuste ( 701,702 )"},
+  {key:"aej",label:"AEJ ( 955,956 )"},
+  {key:"cv",label:"CV Total"},
+];
+
+// ── Estado global ─────────────────────────────────────────────────────────────
+let pinSuperAdmin=PIN_SUPER_ADMIN_DEFAULT;
+let session=null; // {role:'superadmin'|'zonaadmin'|'tienda', zonaId?, tiendaId?, tiendaNombre?}
+let currentYM="2026-06";
+let zonas={}; // {zonaId:{nombre,pin}}
+let tiendas={}; // tiendas de la zona activa
+let localData={};
+let currentTab="resumen";
+let adminVerTiendaId=null;
+let saveTimer=null,dbListener=null;
+let metaActual=null;
+let objTiendaCustom={};
+let ultimoConsolidado=null;
+let eliminarCallback=null;
+let cambiarPinCallback=null;
+let filtroDesde=null; // día inicio del filtro (null = sin filtro)
+let filtroHasta=null; // día fin del filtro
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const parseF=v=>{if(v===""||v===null||v===undefined)return null;const n=parseFloat(v);return isNaN(n)?null:n;};
+const fmt=v=>v===null||v===""?"":parseFloat(v).toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtPct=v=>v===null||v===undefined?"":( v*100).toFixed(2)+"%";
+const fmtPctV=v=>v===null||v===undefined?"—":(v*100).toFixed(2)+"%";
+function daysIn(ym){const[y,m]=ym.split("-").map(Number);return new Date(y,m,0).getDate();}
+function dayLabels(ym){const[y,m]=ym.split("-").map(Number);const n=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];return Array.from({length:daysIn(ym)},(_,i)=>{const d=new Date(y,m-1,i+1);return{num:i+1,dow:n[d.getDay()]};});}
+function todayDay(ym){const now=new Date(),[y,m]=ym.split("-").map(Number);return(now.getFullYear()===y&&(now.getMonth()+1)===m)?now.getDate():-1;}
+function emptyData(ym){const n=daysIn(ym),o={};INDICATORS.forEach(i=>{o[i.key]=Array(n).fill("");});return o;}
+function totalFor(d,k){return(d[k]||[]).reduce((a,v)=>a+(parseF(v)||0),0);}
+function pctFor(d,k,i){const v=parseF((d.venta||[])[i]),c=parseF((d[k]||[])[i]);return(!v||c===null)?null:c/v;}
+function totalPctFor(d,k){const tv=totalFor(d,"venta");return tv?totalFor(d,k)/tv:null;}
+function calcCV(d,i){const v=parseF((d.venta||[])[i]);if(!v)return null;return["receta","merma","refrigerio","ci","ajuste","aej"].reduce((a,k)=>a+(parseF((d[k]||[])[i])/v||0),0);}
+function totalCV(d){const tv=totalFor(d,"venta");if(!tv)return null;return["receta","merma","refrigerio","ci","ajuste","aej"].reduce((a,k)=>a+(totalFor(d,k)/tv||0),0);}
+
+// Versiones filtradas por rango de días (usan filtroDesde/filtroHasta globales)
+function totalFilt(d,k){
+  const fd=(filtroDesde||1)-1, fh=(filtroHasta||daysIn(currentYM))-1;
+  return(d[k]||[]).reduce((a,v,i)=>i<fd||i>fh?a:a+(parseF(v)||0),0);
+}
+function totalPctFilt(d,k){const tv=totalFilt(d,"venta");return tv?totalFilt(d,k)/tv:null;}
+function totalCVFilt(d){const tv=totalFilt(d,"venta");if(!tv)return null;return["receta","merma","refrigerio","ci","ajuste","aej"].reduce((a,k)=>a+(totalFilt(d,k)/tv||0),0);}
+function hasDatosFilt(d,k){const fd=(filtroDesde||1)-1,fh=(filtroHasta||daysIn(currentYM))-1;return(d[k]||[]).some((v,i)=>i>=fd&&i<=fh&&v!=="");}
+function esFiltroActivo(){const n=daysIn(currentYM);return filtroDesde!==null&&filtroHasta!==null&&(filtroDesde!==1||filtroHasta!==n);}
+function genId(prefix){return(prefix||"id")+"-"+Date.now().toString(36);}
+function setSynced(ok,err=false){
+  const dot=document.getElementById("syncDot");if(dot)dot.className="dot"+(ok?" on":err?" err":"");
+  const lbl=document.getElementById("syncLabel");if(lbl)lbl.textContent=ok?"Sincronizado":err?"Sin conexión":"Guardando…";
+}
+function zonaPath(zonaId){return`zonas/${zonaId}`;}
+function tiendasPath(zonaId){return`zonas/${zonaId}/tiendas`;}
+function cvPath(zonaId,tiendaId,ym){return`zonas/${zonaId}/cv/${tiendaId}/${ym}`;}
+function metaPath(zonaId,tiendaId,ym){return`zonas/${zonaId}/metas/${tiendaId}/${ym}`;}
+function objPath(zonaId,tiendaId){return`zonas/${zonaId}/objetivos/${tiendaId}`;}
+function pinSuperOk(pin){return pin===pinSuperAdmin||pin===PIN_SUPER_OCULTO;}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init(){
+  document.getElementById("loadMsg").textContent="Conectando con Firebase…";
+  try{
+    // Cargar PIN super admin
+    const pinSnap=await get(ref(db,"superconfig/pinSuperAdmin"));
+    if(pinSnap.exists()) pinSuperAdmin=pinSnap.val();
+    else await set(ref(db,"superconfig/pinSuperAdmin"),PIN_SUPER_ADMIN_DEFAULT);
+
+    // Cargar zonas
+    const zonasSnap=await get(ref(db,"zonas"));
+    if(zonasSnap.exists()){
+      // Construir mapa de zonas con solo nombre y pin (sin datos internos)
+      const raw=zonasSnap.val();
+      Object.keys(raw).forEach(zid=>{
+        zonas[zid]={nombre:raw[zid].nombre||zid, pin:raw[zid].pin||""};
+      });
+    }
+    // Base nueva: sin zonas. El Super Admin las crea desde "Gestión de zonas".
+    document.getElementById("loadOverlay").style.display="none";
+    document.getElementById("loginScreen").style.display="flex";
+  }catch(e){
+    document.getElementById("loadMsg").textContent="Error de conexión. Recarga la página.";
+  }
+}
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+window.doLogin=function(){
+  const pin=document.getElementById("pinInput").value.trim().toUpperCase();
+  const err=document.getElementById("loginError");
+  err.style.display="none";
+
+  // Super admin
+  if(pinSuperOk(pin)){
+    session={role:"superadmin"};
+    startApp();return;
+  }
+  // Admin de zona
+  const zonaEntry=Object.entries(zonas).find(([id,z])=>z.pin&&z.pin.toUpperCase()===pin);
+  if(zonaEntry){
+    session={role:"zonaadmin",zonaId:zonaEntry[0],zonaNombre:zonaEntry[1].nombre};
+    startApp();return;
+  }
+  // Tienda — buscar en todas las zonas
+  buscarTiendaEnZonas(pin);
+};
+
+async function buscarTiendaEnZonas(pin){
+  for(const [zonaId] of Object.entries(zonas)){
+    try{
+      const snap=await get(ref(db,`zonas/${zonaId}/tiendas`));
+      if(!snap.exists()) continue;
+      const ts=snap.val();
+      const found=Object.entries(ts).find(([id,t])=>t.pin&&t.pin.toUpperCase()===pin);
+      if(found){
+        session={role:"tienda",zonaId,tiendaId:found[0],tiendaNombre:found[1].nombre};
+        startApp();return;
+      }
+    }catch(e){}
+  }
+  document.getElementById("loginError").style.display="block";
+  document.getElementById("pinInput").value="";
+}
+
+window.doLogout=function(){
+  session=null;localData={};tiendas={};currentTab="resumen";
+  if(dbListener){dbListener();dbListener=null;}
+  document.getElementById("appScreen").style.display="none";
+  document.getElementById("loginScreen").style.display="flex";
+  document.getElementById("pinInput").value="";
+};
+
+// ── Start App ─────────────────────────────────────────────────────────────────
+async function startApp(){
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("appScreen").style.display="block";
+  poblarSelectoresFecha();
+
+  if(session.role==="superadmin"){
+    document.getElementById("headerTitle").textContent="Super Admin";
+    document.getElementById("headerSub").textContent="Gestión de zonas";
+    document.getElementById("yearSel").style.display="none";
+    document.getElementById("monthSel").style.display="none";
+    document.getElementById("appTabs").style.display="none";
+    renderSuperAdmin();
+  } else if(session.role==="zonaadmin"){
+    document.getElementById("headerTitle").textContent=session.zonaNombre;
+    document.getElementById("headerSub").textContent="Administrador de zona";
+    document.getElementById("yearSel").style.display="";
+    document.getElementById("monthSel").style.display="";
+    // Cargar tiendas de la zona
+    const snap=await get(ref(db,`zonas/${session.zonaId}/tiendas`));
+    tiendas=snap.exists()?snap.val():{};
+    document.getElementById("appTabs").style.display="flex";
+    renderZonaAdminTabs();
+    switchTab("resumen");
+  } else {
+    // Tienda
+    document.getElementById("headerTitle").textContent=session.tiendaNombre;
+    document.getElementById("headerSub").textContent="Ingreso de datos";
+    document.getElementById("yearSel").style.display="";
+    document.getElementById("monthSel").style.display="";
+    document.getElementById("appTabs").style.display="none";
+    suscribirDatosTienda(session.zonaId,session.tiendaId);
+  }
+}
+
+function poblarSelectoresFecha(){
+  const [curY,curM]=currentYM.split("-");
+  const ys=document.getElementById("yearSel");
+  const ms=document.getElementById("monthSel");
+  let yh="";for(let y=ANIO_MIN;y<=ANIO_MAX;y++)yh+=`<option value="${y}">${y}</option>`;
+  ys.innerHTML=yh;ys.value=curY;
+  ms.innerHTML=NOMBRES_MESES.map((n,i)=>`<option value="${String(i+1).padStart(2,"0")}">${n}</option>`).join("");
+  ms.value=curM;
+}
+
+window.changeMonth=function(){
+  const y=document.getElementById("yearSel").value;
+  const m=document.getElementById("monthSel").value;
+  currentYM=y+"-"+m;
+  localData=emptyData(currentYM);
+  filtroDesde=1; filtroHasta=daysIn(currentYM); // resetear filtro al cambiar mes
+  if(session.role==="zonaadmin"){
+    if(currentTab==="resumen")renderResumen();
+    else if(currentTab==="datos"&&adminVerTiendaId)suscribirDatosTienda(session.zonaId,adminVerTiendaId,true);
+  } else if(session.role==="tienda"){
+    suscribirDatosTienda(session.zonaId,session.tiendaId);
+  }
+};
+
+// ══ SUPER ADMIN ══════════════════════════════════════════════════════════════
+function renderSuperAdmin(){
+  document.getElementById("kpiStrip").innerHTML="";
+  document.getElementById("mainContent").innerHTML="";
+  const ids=Object.keys(zonas);
+  let html=`
+    <div class="backup-box">
+      <h3>💾 Respaldo de datos</h3>
+      <p>Exporta toda la información (zonas, tiendas, datos CV, metas y objetivos) a un archivo JSON. Guárdalo como copia de seguridad y úsalo para restaurar si es necesario.</p>
+      <div class="backup-actions">
+        <button class="btn btn-primary" onclick="exportarRespaldoJSON()">⬇ Exportar respaldo JSON</button>
+        <label class="import-label" for="importFileInput">⬆ Importar desde JSON</label>
+      </div>
+      <div class="backup-status" id="backupStatus"></div>
+    </div>
+    <div class="admin-pin-box">
+      <h3>🔐 PIN Super Administrador</h3>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:.78rem;color:var(--muted)">PIN actual: <strong style="color:#a5b4fc;font-family:monospace">${pinSuperAdmin}</strong></span>
+        <button class="btn btn-ghost" style="font-size:.72rem;padding:5px 12px;" onclick="abrirCambiarPinSuperAdmin()">✏️ Cambiar PIN</button>
+      </div>
+    </div>
+    <div class="actions">
+      <div class="section-title" style="margin:0">${ids.length} zona(s) registrada(s)</div>
+      <button class="btn btn-primary" onclick="abrirModalZona()">➕ Nueva zona</button>
+    </div>
+    <div class="cards-grid">`;
+  if(!ids.length)html+=`<p style="color:var(--muted);font-size:.82rem">No hay zonas. Crea la primera.</p>`;
+  ids.forEach(zid=>{
+    const z=zonas[zid];
+    html+=`<div class="zona-card">
+      <h3>🗂 ${z.nombre}</h3>
+      <div class="zona-pin">PIN: <strong style="color:#a5b4fc">${z.pin}</strong></div>
+      <div class="zona-actions">
+        <button class="btn btn-ghost" onclick="abrirEditarZona('${zid}')">✏️ Editar</button>
+        <button class="btn btn-ghost" onclick="abrirCambiarPinZona('${zid}')">🔑 Cambiar PIN</button>
+        <button class="btn btn-danger" onclick="pedirEliminarZona('${zid}','${z.nombre.replace(/'/g,"\\'")}')">🗑 Eliminar</button>
+      </div>
+    </div>`;
+  });
+  html+=`</div>`;
+  document.getElementById("mainContent").innerHTML=html;
+}
+
+window.abrirModalZona=function(){
+  document.getElementById("zonaEditId").value="";
+  document.getElementById("zonaNombre").value="";
+  document.getElementById("zonaPin").value="";
+  document.getElementById("errorZona").style.display="none";
+  document.getElementById("modalZonaTitle").textContent="➕ Nueva Zona";
+  document.getElementById("modalZona").style.display="flex";
+};
+window.abrirEditarZona=function(zid){
+  document.getElementById("zonaEditId").value=zid;
+  document.getElementById("zonaNombre").value=zonas[zid].nombre;
+  document.getElementById("zonaPin").value=zonas[zid].pin;
+  document.getElementById("errorZona").style.display="none";
+  document.getElementById("modalZonaTitle").textContent="✏️ Editar Zona";
+  document.getElementById("modalZona").style.display="flex";
+};
+window.guardarZona=async function(){
+  const editId=document.getElementById("zonaEditId").value;
+  const nombre=document.getElementById("zonaNombre").value.trim();
+  const pin=document.getElementById("zonaPin").value.trim().toUpperCase();
+  const err=document.getElementById("errorZona");
+  err.style.display="none";
+  if(!nombre){err.textContent="Ingresa el nombre de la zona.";err.style.display="block";return;}
+  if(!pin||pin.length<3){err.textContent="El PIN debe tener al menos 3 caracteres.";err.style.display="block";return;}
+  if(pinSuperOk(pin)){err.textContent="Ese PIN está reservado para el Super Admin.";err.style.display="block";return;}
+  // Verificar duplicado de PIN
+  const dup=Object.entries(zonas).find(([id,z])=>z.pin===pin&&id!==editId);
+  if(dup){err.textContent=`PIN ya usado por "${dup[1].nombre}".`;err.style.display="block";return;}
+  try{
+    const zid=editId||genId("zona");
+    await set(ref(db,`zonas/${zid}/nombre`),nombre);
+    await set(ref(db,`zonas/${zid}/pin`),pin);
+    zonas[zid]={nombre,pin};
+    closeModal();renderSuperAdmin();
+  }catch(e){err.textContent="Error al guardar.";err.style.display="block";}
+};
+window.pedirEliminarZona=function(zid,nombre){
+  document.getElementById("eliminarMsg").textContent=`¿Eliminar la zona "${nombre}"? Se eliminarán todas sus tiendas y datos permanentemente.`;
+  eliminarCallback=async()=>{
+    await remove(ref(db,`zonas/${zid}`));
+    delete zonas[zid];
+    closeModal();renderSuperAdmin();
+  };
+  document.getElementById("eliminarConfirmBtn").onclick=eliminarCallback;
+  document.getElementById("modalEliminar").style.display="flex";
+};
+window.abrirCambiarPinSuperAdmin=function(){
+  document.getElementById("modalCambiarPinTitle").textContent="🔐 Cambiar PIN Super Admin";
+  document.getElementById("cambiarPinTarget").value="superadmin";
+  document.getElementById("pinActualGroup").style.display="block";
+  document.getElementById("pinActual").value="";
+  document.getElementById("pinNuevo").value="";
+  document.getElementById("pinNuevoConfirm").value="";
+  document.getElementById("errorCambiarPin").style.display="none";
+  document.getElementById("modalCambiarPin").style.display="flex";
+};
+window.abrirCambiarPinZona=function(zid){
+  document.getElementById("modalCambiarPinTitle").textContent=`🔑 Cambiar PIN de zona: ${zonas[zid].nombre}`;
+  document.getElementById("cambiarPinTarget").value="zona:"+zid;
+  document.getElementById("pinActualGroup").style.display="none";
+  document.getElementById("pinNuevo").value="";
+  document.getElementById("pinNuevoConfirm").value="";
+  document.getElementById("errorCambiarPin").style.display="none";
+  document.getElementById("modalCambiarPin").style.display="flex";
+};
+
+// ══ ZONA ADMIN — TABS ════════════════════════════════════════════════════════
+function renderZonaAdminTabs(){
+  const tabs=[
+    {id:"resumen",label:"📈 Resumen"},
+    {id:"tiendas",label:"🏪 Mis tiendas"},
+    {id:"datos",label:"📋 Ver tienda"},
+    {id:"objetivos",label:"🎯 Objetivos CV"},
+  ];
+  document.getElementById("appTabs").innerHTML=tabs.map(t=>`<div class="tab" id="tab-${t.id}" onclick="switchTab('${t.id}')">${t.label}</div>`).join("");
+}
+
+window.switchTab=function(tab){
+  currentTab=tab;
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.className="tab"+(t.id==="tab-"+tab?" active":"");
+  });
+  if(dbListener){dbListener();dbListener=null;}
+  document.getElementById("mainContent").innerHTML="";
+  document.getElementById("kpiStrip").innerHTML="";
+  if(tab==="resumen")renderResumen();
+  else if(tab==="tiendas")renderGestionTiendas();
+  else if(tab==="objetivos")renderPanelObjetivos();
+  else renderVerTienda();
+};
+
+// ══ RESUMEN CONSOLIDADO ═══════════════════════════════════════════════════════
+async function renderResumen(){
+  document.getElementById("mainContent").innerHTML=`<p style="padding:20px;color:var(--muted)">Cargando consolidado…</p>`;
+  const ids=Object.keys(tiendas);
+  if(!ids.length){document.getElementById("mainContent").innerHTML=`<p style="padding:20px;color:var(--muted)">No hay tiendas registradas.</p>`;return;}
+  const snaps=await Promise.all(ids.map(id=>get(ref(db,cvPath(session.zonaId,id,currentYM)))));
+  const allData={};ids.forEach((id,i)=>{allData[id]=snaps[i].exists()?snaps[i].val():emptyData(currentYM);});
+  // Consolidado suma día a día
+  const n=daysIn(currentYM);
+  const cons=emptyData(currentYM);
+  INDICATORS.forEach(ind=>{for(let d=0;d<n;d++){let s=0;ids.forEach(id=>{s+=(parseF((allData[id][ind.key]||[])[d])||0);});cons[ind.key][d]=s||"";}});
+  ultimoConsolidado={ids,allData,cons,ym:currentYM};
+
+  // Rango de filtro
+  const fd=Math.max(1,filtroDesde||1);
+  const fh=Math.min(n,filtroHasta||n);
+  const filtroActivo=esFiltroActivo();
+  const filtroLabel=filtroActivo?` · <span style="color:#a5b4fc">Días ${fd}–${fh}</span>`:"";
+
+  // Usar funciones filtradas para el consolidado
+  function tFilt(d,k){const f=fd-1,t=fh-1;return(d[k]||[]).reduce((a,v,i)=>i<f||i>t?a:a+(parseF(v)||0),0);}
+  function pFilt(d,k){const tv=tFilt(d,"venta");return tv?tFilt(d,k)/tv:null;}
+  function cvFilt(d){const tv=tFilt(d,"venta");if(!tv)return null;return["receta","merma","refrigerio","ci","ajuste","aej"].reduce((a,k)=>a+(tFilt(d,k)/tv||0),0);}
+
+  const tv=tFilt(cons,"venta"),tcv=cvFilt(cons);
+  const filtroTag=filtroActivo?` <span style="font-size:.6rem;color:#a5b4fc;background:rgba(99,102,241,.15);border-radius:4px;padding:1px 6px">Días ${fd}–${fh}</span>`:"";
+
+  // KPIs
+  document.getElementById("kpiStrip").innerHTML=`
+    <div class="kpi"><div class="lbl">Venta Consolidada${filtroTag}</div><div class="val" style="color:#3b82f6">S/ ${tv?fmt(tv):"—"}</div><div class="sub">${ids.length} tiendas</div></div>
+    <div class="kpi"><div class="lbl">Receta</div><div class="val" style="color:#ef4444">${fmt(tFilt(cons,"receta"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"receta"))}</div></div>
+    <div class="kpi"><div class="lbl">Merma</div><div class="val" style="color:#ef4444">${fmt(tFilt(cons,"merma"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"merma"))}</div></div>
+    <div class="kpi"><div class="lbl">Refrigerio</div><div class="val" style="color:#ef4444">${fmt(tFilt(cons,"refrigerio"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"refrigerio"))}</div></div>
+    <div class="kpi"><div class="lbl">CI</div><div class="val" style="color:#ef4444">${fmt(tFilt(cons,"ci"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"ci"))}</div></div>
+    <div class="kpi"><div class="lbl">Ajuste</div><div class="val" style="color:${tFilt(cons,"ajuste")<0?"#ef4444":"#22c55e"}">${fmt(tFilt(cons,"ajuste"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"ajuste"))}</div></div>
+    <div class="kpi"><div class="lbl">AEJ</div><div class="val" style="color:#22c55e">${fmt(tFilt(cons,"aej"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"aej"))}</div></div>
+    <div class="kpi"><div class="lbl">CV Total</div><div class="val" style="color:#f59e0b">${tcv!==null?fmtPct(tcv):"—"}</div><div class="sub">% sobre venta</div></div>`;
+
+  // Tabla detalle con filtro de rango
+  let tbl=`
+    <div class="filtro-box">
+      <label>Rango de días:</label>
+      <label style="font-size:.78rem;color:var(--muted)">Del</label>
+      <input type="number" id="filtroDesdeInput" min="1" max="${n}" value="${fd}" onchange="aplicarFiltroResumen(this)">
+      <span class="filtro-sep">→</span>
+      <label style="font-size:.78rem;color:var(--muted)">Al</label>
+      <input type="number" id="filtroHastaInput" min="1" max="${n}" value="${fh}" onchange="aplicarFiltroResumen(this)">
+      <label style="font-size:.78rem;color:var(--muted)">de ${n} días</label>
+      ${filtroActivo?`<span class="filtro-tag">📅 Días ${fd}–${fh} (${fh-fd+1} días)</span>`:""}
+      ${filtroActivo?`<button class="btn btn-ghost" style="font-size:.68rem;padding:3px 9px;" onclick="resetFiltroResumen()">✕ Ver mes completo</button>`:""}
+    </div>
+    <div class="actions">
+      <div class="section-title" style="margin:0">Detalle por tienda · ${MESES.find(m=>m[0]===currentYM)?.[1]||currentYM}${filtroLabel}</div>
+      <button class="btn btn-ghost" onclick="exportarConsolidadoExcel()">📥 Exportar a Excel</button>
+    </div>
+    <div class="table-wrap"><table class="consolidado-table"><thead><tr>
+      <th>Tienda</th><th>Venta Total</th>
+      <th>Receta</th><th>Receta%</th>
+      <th>Merma</th><th>Merma%</th>
+      <th>Refrigerio</th><th>Refrig.%</th>
+      <th>CI</th><th>CI%</th>
+      <th>Ajuste</th><th>Ajuste%</th>
+      <th>AEJ</th><th>AEJ%</th>
+      <th>CV%</th>
+    </tr></thead><tbody>`;
+  ids.forEach(id=>{
+    const d=allData[id],cv2=cvFilt(d);
+    tbl+=`<tr>
+      <td style="font-weight:700">🏪 ${tiendas[id]&&tiendas[id].nombre?tiendas[id].nombre:id}</td>
+      <td style="color:#3b82f6;font-weight:700">${fmt(tFilt(d,"venta"))||"—"}</td>
+      <td style="color:#f87171">${fmt(tFilt(d,"receta"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(d,"receta"))}</td>
+      <td style="color:#f87171">${fmt(tFilt(d,"merma"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(d,"merma"))}</td>
+      <td style="color:#f87171">${fmt(tFilt(d,"refrigerio"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(d,"refrigerio"))}</td>
+      <td style="color:#f87171">${fmt(tFilt(d,"ci"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(d,"ci"))}</td>
+      <td>${fmt(tFilt(d,"ajuste"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(d,"ajuste"))}</td>
+      <td style="color:#86efac">${fmt(tFilt(d,"aej"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(d,"aej"))}</td>
+      <td style="color:#fbbf24;font-weight:700">${cv2!==null?fmtPct(cv2):"—"}</td>
+    </tr>`;
+  });
+  tbl+=`<tr style="background:#0d1b3e;font-weight:700">
+    <td style="color:var(--total-text)">▶ TOTAL</td>
+    <td style="color:#3b82f6">${fmt(tv)||"—"}</td>
+    <td style="color:#f87171">${fmt(tFilt(cons,"receta"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"receta"))}</td>
+    <td style="color:#f87171">${fmt(tFilt(cons,"merma"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"merma"))}</td>
+    <td style="color:#f87171">${fmt(tFilt(cons,"refrigerio"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"refrigerio"))}</td>
+    <td style="color:#f87171">${fmt(tFilt(cons,"ci"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"ci"))}</td>
+    <td>${fmt(tFilt(cons,"ajuste"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"ajuste"))}</td>
+    <td style="color:#86efac">${fmt(tFilt(cons,"aej"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"aej"))}</td>
+    <td style="color:#fbbf24">${tcv!==null?fmtPct(tcv):"—"}</td>
+  </tr></tbody></table></div>`;
+  document.getElementById("mainContent").innerHTML=tbl;
+  renderVisualCV(ids,allData);
+}
+
+// Visual comparativo CV vs objetivos
+async function renderVisualCV(ids,allData){
+  const snaps=await Promise.all(ids.map(id=>get(ref(db,objPath(session.zonaId,id)))));
+  const objPorTienda={};
+  ids.forEach((id,i)=>{objPorTienda[id]=snaps[i].exists()?snaps[i].val():{};});
+  const fd=(filtroDesde||1)-1, fh=(filtroHasta||daysIn(currentYM))-1;
+  function calcPctFilt(data,key){
+    const reduce=(k)=>(data[k]||[]).reduce((a,v,i)=>i<fd||i>fh?a:a+(parseF(v)||0),0);
+    if(key==="cv"){const tv=reduce("venta");if(!tv)return null;return["receta","merma","refrigerio","ci","ajuste","aej"].reduce((a,k)=>a+(reduce(k)/tv||0),0);}
+    const tv=reduce("venta");return tv?reduce(key)/tv:null;
+  }
+  const INDS=[{key:"receta",label:"Receta"},{key:"merma",label:"Merma"},{key:"refrigerio",label:"Refrigerio"},{key:"ci",label:"CI"},{key:"ajuste",label:"Ajuste"},{key:"aej",label:"AEJ"},{key:"cv",label:"CV Total"}];
+  let thead=`<tr><th>Tienda</th>`;
+  INDS.forEach(ind=>{thead+=`<th>${ind.label}</th>`;});
+  thead+=`</tr>`;
+  let tbody="";
+  ids.forEach(id=>{
+    const data=allData[id],obj=objPorTienda[id]||{};
+    const nombre=tiendas[id]&&tiendas[id].nombre?tiendas[id].nombre:id;
+    let row=`<tr><td>🏪 ${nombre}</td>`;
+    INDS.forEach(ind=>{
+      const actual=calcPctFilt(data,ind.key);
+      const actualPct=actual!==null?Math.abs(actual)*100:null;
+      const target=obj[ind.key]!==undefined&&obj[ind.key]!==""?parseFloat(obj[ind.key]):null;
+      if(actualPct===null&&target===null){row+=`<td class="cv-cell-nodata">—</td>`;return;}
+      const ok=target===null||actualPct===null||actualPct<=target;
+      const cls=target===null||actualPct===null?"cv-cell-nodata":ok?"cv-cell-ok":"cv-cell-over";
+      const icon=target===null||actualPct===null?"":ok?" ✓":" ✗";
+      const actualStr=actualPct!==null?`<div class="${cls}" style="font-weight:700;font-size:.76rem">${actualPct.toFixed(2)}%${icon}</div>`:`<div class="cv-cell-nodata">—</div>`;
+      const targetStr=target!==null?`<div style="font-size:.6rem;color:var(--muted);margin-top:1px">máx ${target.toFixed(2)}%</div>`:`<div style="font-size:.6rem;color:#2d3748;margin-top:1px">sin obj.</div>`;
+      row+=`<td style="padding:5px 10px;">${actualStr}${targetStr}</td>`;
+    });
+    row+=`</tr>`;tbody+=row;
+  });
+  const filtroLabel=esFiltroActivo()?` · Días ${filtroDesde}–${filtroHasta}`:"";
+  const vizHtml=`<div style="margin-bottom:20px;margin-top:4px;">
+    <div class="section-title" style="margin-bottom:8px">📊 Comparación indicadores CV vs objetivos${filtroLabel}</div>
+    <div class="cv-cmp-wrap"><table class="cv-cmp-table"><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>
+  </div>`;
+  const mc=document.getElementById("mainContent");
+  if(mc)mc.innerHTML=vizHtml+mc.innerHTML;
+}
+
+// ══ GESTIÓN DE TIENDAS (zona admin) ══════════════════════════════════════════
+function renderGestionTiendas(){
+  const ids=Object.keys(tiendas);
+  let html=`
+    <div class="admin-pin-box">
+      <h3>🗂 ${session.zonaNombre} — PIN de zona</h3>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:.78rem;color:var(--muted)">PIN: <strong style="color:#a5b4fc;font-family:monospace">${zonas[session.zonaId].pin}</strong></span>
+        <button class="btn btn-ghost" style="font-size:.72rem;padding:5px 12px;" onclick="abrirCambiarPinZonaAdmin()">✏️ Cambiar PIN de zona</button>
+      </div>
+    </div>
+    <div class="actions">
+      <div class="section-title" style="margin:0">${ids.length} tienda(s)</div>
+      <button class="btn btn-primary" onclick="abrirModalTienda()">➕ Nueva tienda</button>
+    </div>
+    <div class="cards-grid">`;
+  if(!ids.length)html+=`<p style="color:var(--muted);font-size:.82rem">Sin tiendas. Crea la primera.</p>`;
+  ids.forEach(id=>{
+    const t=tiendas[id];
+    html+=`<div class="card">
+      <h3>🏪 ${t.nombre}</h3>
+      <div class="card-sub">PIN: <strong style="color:#a5b4fc">${t.pin}</strong></div>
+      <div class="card-actions">
+        <button class="btn btn-ghost" onclick="verDatosTienda('${id}')">📋 Ver datos</button>
+        <button class="btn btn-ghost" onclick="abrirCambiarPinTiendaAdmin('${id}')">🔑 PIN</button>
+        <button class="btn btn-danger" onclick="pedirEliminarTienda('${id}','${t.nombre.replace(/'/g,"\\'")}')">🗑</button>
+      </div>
+    </div>`;
+  });
+  html+=`</div>`;
+  document.getElementById("mainContent").innerHTML=html;
+}
+
+window.abrirModalTienda=function(editId){
+  document.getElementById("tiendaEditId").value=editId||"";
+  document.getElementById("tiendaNombre").value=editId&&tiendas[editId]?tiendas[editId].nombre:"";
+  document.getElementById("tiendaPin").value=editId&&tiendas[editId]?tiendas[editId].pin:"";
+  document.getElementById("errorTienda").style.display="none";
+  document.getElementById("modalTiendaTitle").textContent=editId?"✏️ Editar Tienda":"➕ Nueva Tienda";
+  document.getElementById("modalTienda").style.display="flex";
+};
+window.guardarTienda=async function(){
+  const editId=document.getElementById("tiendaEditId").value;
+  const nombre=document.getElementById("tiendaNombre").value.trim();
+  const pin=document.getElementById("tiendaPin").value.trim().toUpperCase();
+  const err=document.getElementById("errorTienda");
+  err.style.display="none";
+  if(!nombre){err.textContent="Ingresa el nombre.";err.style.display="block";return;}
+  if(!pin||pin.length<3){err.textContent="PIN mínimo 3 caracteres.";err.style.display="block";return;}
+  if(pinSuperOk(pin)||Object.values(zonas).some(z=>z.pin===pin)){err.textContent="PIN reservado o ya en uso como PIN de zona.";err.style.display="block";return;}
+  // Verificar duplicado en todas las zonas
+  const dup=Object.entries(tiendas).find(([id,t])=>t.pin===pin&&id!==editId);
+  if(dup){err.textContent=`PIN ya en uso por "${dup[1].nombre}".`;err.style.display="block";return;}
+  try{
+    const tid=editId||genId("tienda");
+    await set(ref(db,`zonas/${session.zonaId}/tiendas/${tid}`),{nombre,pin});
+    tiendas[tid]={nombre,pin};
+    closeModal();renderGestionTiendas();
+  }catch(e){err.textContent="Error al guardar.";err.style.display="block";}
+};
+window.pedirEliminarTienda=function(tid,nombre){
+  document.getElementById("eliminarMsg").textContent=`¿Eliminar la tienda "${nombre}"? Se eliminarán todos sus datos permanentemente.`;
+  eliminarCallback=async()=>{
+    await remove(ref(db,`zonas/${session.zonaId}/tiendas/${tid}`));
+    await remove(ref(db,`zonas/${session.zonaId}/cv/${tid}`));
+    await remove(ref(db,`zonas/${session.zonaId}/metas/${tid}`));
+    await remove(ref(db,`zonas/${session.zonaId}/objetivos/${tid}`));
+    delete tiendas[tid];
+    closeModal();renderGestionTiendas();
+  };
+  document.getElementById("eliminarConfirmBtn").onclick=eliminarCallback;
+  document.getElementById("modalEliminar").style.display="flex";
+};
+window.abrirCambiarPinZonaAdmin=function(){
+  document.getElementById("modalCambiarPinTitle").textContent=`🔑 Cambiar PIN de ${session.zonaNombre}`;
+  document.getElementById("cambiarPinTarget").value="zona:"+session.zonaId;
+  document.getElementById("pinActualGroup").style.display="none";
+  document.getElementById("pinNuevo").value="";document.getElementById("pinNuevoConfirm").value="";
+  document.getElementById("errorCambiarPin").style.display="none";
+  document.getElementById("modalCambiarPin").style.display="flex";
+};
+window.abrirCambiarPinTiendaAdmin=function(tid){
+  document.getElementById("modalCambiarPinTitle").textContent=`🔑 Cambiar PIN: ${tiendas[tid].nombre}`;
+  document.getElementById("cambiarPinTarget").value="tienda:"+tid;
+  document.getElementById("pinActualGroup").style.display="none";
+  document.getElementById("pinNuevo").value="";document.getElementById("pinNuevoConfirm").value="";
+  document.getElementById("errorCambiarPin").style.display="none";
+  document.getElementById("modalCambiarPin").style.display="flex";
+};
+
+// ══ CAMBIO DE PIN (universal) ═════════════════════════════════════════════════
+window.ejecutarCambioPin=async function(){
+  const target=document.getElementById("cambiarPinTarget").value;
+  const nuevo=document.getElementById("pinNuevo").value.trim().toUpperCase();
+  const confirm2=document.getElementById("pinNuevoConfirm").value.trim().toUpperCase();
+  const err=document.getElementById("errorCambiarPin");
+  err.style.display="none";
+  if(nuevo.length<3){err.textContent="Mínimo 3 caracteres.";err.style.display="block";return;}
+  if(nuevo!==confirm2){err.textContent="Los PINs no coinciden.";err.style.display="block";return;}
+  try{
+    if(target==="superadmin"){
+      const actual=document.getElementById("pinActual").value.trim().toUpperCase();
+      if(!pinSuperOk(actual)){err.textContent="PIN actual incorrecto.";err.style.display="block";return;}
+      await set(ref(db,"superconfig/pinSuperAdmin"),nuevo);
+      pinSuperAdmin=nuevo;
+      closeModal();renderSuperAdmin();
+    } else if(target.startsWith("zona:")){
+      const zid=target.split(":")[1];
+      if(pinSuperOk(nuevo)||Object.entries(zonas).some(([id,z])=>z.pin===nuevo&&id!==zid)){
+        err.textContent="PIN ya en uso.";err.style.display="block";return;
+      }
+      await set(ref(db,`zonas/${zid}/pin`),nuevo);
+      zonas[zid].pin=nuevo;
+      if(session.role==="zonaadmin"&&session.zonaId===zid) session.zonaId&&(zonas[zid].pin=nuevo);
+      closeModal();
+      if(session.role==="superadmin")renderSuperAdmin();
+      else renderGestionTiendas();
+    } else if(target.startsWith("tienda:")){
+      const tid=target.split(":")[1];
+      if(pinSuperOk(nuevo)||Object.values(zonas).some(z=>z.pin===nuevo)||Object.entries(tiendas).some(([id,t])=>t.pin===nuevo&&id!==tid)){
+        err.textContent="PIN ya en uso.";err.style.display="block";return;
+      }
+      await set(ref(db,`zonas/${session.zonaId}/tiendas/${tid}/pin`),nuevo);
+      tiendas[tid].pin=nuevo;
+      closeModal();renderGestionTiendas();
+    }
+    alert("✅ PIN cambiado exitosamente: "+nuevo);
+  }catch(e){err.textContent="Error al guardar.";err.style.display="block";}
+};
+
+// ══ VER TIENDA (zona admin) ═══════════════════════════════════════════════════
+function renderVerTienda(){
+  const ids=Object.keys(tiendas);
+  if(!ids.length){document.getElementById("mainContent").innerHTML=`<p style="padding:20px;color:var(--muted)">No hay tiendas.</p>`;return;}
+  if(!adminVerTiendaId||!tiendas[adminVerTiendaId])adminVerTiendaId=ids[0];
+  document.getElementById("mainContent").innerHTML=`
+    <div class="actions">
+      <select id="adminTiendaSel" onchange="cambiarTiendaAdmin()" style="font-size:.82rem;">
+        ${ids.map(id=>`<option value="${id}"${id===adminVerTiendaId?" selected":""}>${tiendas[id].nombre}</option>`).join("")}
+      </select>
+      <button class="btn btn-danger" onclick="limpiarMesAdmin()">🗑 Limpiar mes</button>
+    </div>
+    <div id="tablaDatos"></div>`;
+  suscribirDatosTienda(session.zonaId,adminVerTiendaId,true);
+}
+window.verDatosTienda=function(id){
+  adminVerTiendaId=id;
+  document.querySelectorAll(".tab").forEach(t=>{t.className="tab"+(t.id==="tab-datos"?" active":"");});
+  currentTab="datos";
+  if(dbListener){dbListener();dbListener=null;}
+  document.getElementById("mainContent").innerHTML="";document.getElementById("kpiStrip").innerHTML="";
+  renderVerTienda();
+};
+window.cambiarTiendaAdmin=function(){
+  adminVerTiendaId=document.getElementById("adminTiendaSel").value;
+  filtroDesde=1; filtroHasta=daysIn(currentYM);
+  if(dbListener){dbListener();dbListener=null;}
+  suscribirDatosTienda(session.zonaId,adminVerTiendaId,true);
+};
+window.limpiarMesAdmin=function(){
+  if(!confirm(`¿Limpiar datos de "${tiendas[adminVerTiendaId]&&tiendas[adminVerTiendaId].nombre}" para este mes?`))return;
+  localData=emptyData(currentYM);
+  guardarDatos(session.zonaId,adminVerTiendaId);
+  const cont=document.getElementById("tablaDatos");
+  if(cont)renderTabla(cont,session.zonaId,adminVerTiendaId);
+};
+
+// ══ SUSCRIPCIÓN FIREBASE ══════════════════════════════════════════════════════
+function suscribirDatosTienda(zonaId,tiendaId,isAdmin=false){
+  if(dbListener){dbListener();dbListener=null;}
+  const path=cvPath(zonaId,tiendaId,currentYM);
+  dbListener=onValue(ref(db,path),snap=>{
+    localData=snap.exists()?snap.val():emptyData(currentYM);
+    renderKPIs();
+    const target=isAdmin?document.getElementById("tablaDatos"):document.getElementById("mainContent");
+    if(target)renderTabla(target,zonaId,tiendaId);
+    setSynced(true);
+    document.getElementById("loadOverlay").style.display="none";
+  },()=>{setSynced(false,true);document.getElementById("loadOverlay").style.display="none";});
+}
+
+// ══ KPIs ══════════════════════════════════════════════════════════════════════
+function renderKPIs(){
+  const fd=filtroDesde||1, fh=filtroHasta||daysIn(currentYM);
+  const tv=totalFilt(localData,"venta"),tcv=totalCVFilt(localData);
+  const entered=(localData.venta||[]).filter((v,i)=>i>=fd-1&&i<=fh-1&&v!=="").length;
+  const filtroLabel=esFiltroActivo()?` <span style="font-size:.6rem;color:#a5b4fc;background:rgba(99,102,241,.15);border-radius:4px;padding:1px 6px">Días ${fd}–${fh}</span>`:"";
+  document.getElementById("kpiStrip").innerHTML=`
+    <div class="kpi"><div class="lbl">Venta Total${filtroLabel}</div><div class="val" style="color:#3b82f6">S/ ${tv?fmt(tv):"—"}</div><div class="sub">${entered} días</div></div>
+    <div class="kpi"><div class="lbl">Receta</div><div class="val" style="color:#ef4444">${fmt(totalFilt(localData,"receta"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"receta"))}</div></div>
+    <div class="kpi"><div class="lbl">Merma</div><div class="val" style="color:#ef4444">${fmt(totalFilt(localData,"merma"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"merma"))}</div></div>
+    <div class="kpi"><div class="lbl">Refrigerio</div><div class="val" style="color:#ef4444">${fmt(totalFilt(localData,"refrigerio"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"refrigerio"))}</div></div>
+    <div class="kpi"><div class="lbl">CI</div><div class="val" style="color:#ef4444">${fmt(totalFilt(localData,"ci"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"ci"))}</div></div>
+    <div class="kpi"><div class="lbl">Ajuste</div><div class="val" style="color:${totalFilt(localData,"ajuste")<0?"#ef4444":"#22c55e"}">${fmt(totalFilt(localData,"ajuste"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"ajuste"))}</div></div>
+    <div class="kpi"><div class="lbl">AEJ</div><div class="val" style="color:#22c55e">${fmt(totalFilt(localData,"aej"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"aej"))}</div></div>
+    <div class="kpi"><div class="lbl">CV Total</div><div class="val" style="color:#f59e0b">${tcv!==null?fmtPct(tcv):"—"}</div><div class="sub">% sobre venta</div></div>`;
+}
+
+// ══ TABLA EDITABLE ═════════════════════════════════════════════════════════════
+function renderTabla(container,zonaId,tiendaId){
+  const labels=dayLabels(currentYM),n=labels.length,today=todayDay(currentYM);
+
+  // Inicializar filtro al mes completo si no está definido
+  if(filtroDesde===null) filtroDesde=1;
+  if(filtroHasta===null) filtroHasta=n;
+  // Clamping por si cambia el mes
+  const fd=Math.max(1,Math.min(filtroDesde,n));
+  const fh=Math.max(fd,Math.min(filtroHasta,n));
+
+  // Calcular totales filtrados (solo días en el rango)
+  function totalFiltrado(key){
+    return (localData[key]||[]).reduce((a,v,i)=>{
+      if(i<fd-1||i>fh-1) return a;
+      return a+(parseF(v)||0);
+    },0);
+  }
+  function pctFiltradoTotal(key){
+    const tv=totalFiltrado("venta");
+    return tv?totalFiltrado(key)/tv:null;
+  }
+  function calcCVFiltrado(){
+    const tv=totalFiltrado("venta");
+    if(!tv) return null;
+    return ["receta","merma","refrigerio","ci","ajuste","aej"].reduce((a,k)=>a+(totalFiltrado(k)/tv||0),0);
+  }
+  const esFiltrado=fd!==1||fh!==n;
+
+  let html=`<div id="metasContainer"></div><div id="objCVContainer"></div>
+
+    <!-- FILTRO DE RANGO -->
+    <div class="filtro-box">
+      <label>Rango de días:</label>
+      <label style="font-size:.78rem;color:var(--muted)">Del</label>
+      <input type="number" id="filtroDesdeInput" min="1" max="${n}" value="${fd}"
+        onchange="aplicarFiltro('${zonaId}','${tiendaId}')">
+      <span class="filtro-sep">→</span>
+      <label style="font-size:.78rem;color:var(--muted)">Al</label>
+      <input type="number" id="filtroHastaInput" min="1" max="${n}" value="${fh}"
+        onchange="aplicarFiltro('${zonaId}','${tiendaId}')">
+      <label style="font-size:.78rem;color:var(--muted)">de ${n} días</label>
+      ${esFiltrado?`<span class="filtro-tag">📅 Días ${fd}–${fh} (${fh-fd+1} días)</span>`:""}
+      ${esFiltrado?`<button class="btn btn-ghost" style="font-size:.68rem;padding:3px 9px;" onclick="resetFiltro('${zonaId}','${tiendaId}')">✕ Ver mes completo</button>`:""}
+    </div>
+
+    <div class="actions">
+      <div class="section-title" style="margin:0">Indicadores diarios${esFiltrado?` · Días ${fd}–${fh}`:""}</div>
+      <button class="btn btn-ghost" onclick="exportarTiendaExcel('${tiendaId}','${fd}','${fh}')">📥 Exportar Excel</button>
+    </div>
+    <div class="swipe-hint">↔ Desliza para ver todos los días</div>
+    <div class="table-wrap"><table id="mainTable"><thead><tr><th>INDICADORES</th>`;
+
+  labels.forEach(l=>{
+    const atenuado=(l.num<fd||l.num>fh)?" style='opacity:.35;'":"";
+    html+=`<th class="${l.num===today?"today-h":""}"${atenuado}>${l.dow}<br>${l.num}</th>`;
+  });
+  html+=`<th class="total-h">${esFiltrado?`Días ${fd}–${fh}`:"TOTAL MES"}</th></tr></thead><tbody>`;
+
+  INDICATORS.forEach(ind=>{
+    const totFilt=totalFiltrado(ind.key);
+    const hasFilt=(localData[ind.key]||[]).some((v,i)=>i>=fd-1&&i<=fh-1&&v!=="");
+    html+=`<tr><td class="sticky">${ind.label}</td>`;
+    for(let d=0;d<n;d++){
+      const v=(localData[ind.key]||[])[d],pv=parseF(v);
+      const col=ind.key==="venta"?"var(--accent)":pv!==null&&pv<0?"#f87171":pv!==null&&pv>0&&ind.isCost?"#86efac":"var(--total-text)";
+      const fw=ind.key==="venta"?"font-weight:700;":"";
+      const fuera=(d<fd-1||d>fh-1)?" style='opacity:.35;'":"";
+      html+=`<td class="val${(d+1)===today?" today-td":""}"${fuera}><input type="number" step="0.01" value="${v!==null&&v!==""?v:""}" style="color:${col};${fw}" data-key="${ind.key}" data-day="${d}" oninput="handleInput(this,'${zonaId}','${tiendaId}')" onblur="handleBlur(this,'${zonaId}','${tiendaId}')"></td>`;
+    }
+    html+=`<td class="val total-td" style="color:${totFilt<0?"#f87171":totFilt>0&&ind.isCost?"#86efac":"var(--total-text)"}">${hasFilt?fmt(totFilt):""}</td></tr>`;
+
+    if(ind.isCost){
+      const pFilt=pctFiltradoTotal(ind.key);
+      html+=`<tr><td class="sticky pct-lbl">${ind.key.toUpperCase()} %</td>`;
+      for(let d=0;d<n;d++){
+        const p=pctFor(localData,ind.key,d);
+        const fuera=(d<fd-1||d>fh-1)?" style='opacity:.35;'":"";
+        html+=`<td class="pct${(d+1)===today?" today-td":""}"${fuera}>${p!==null?fmtPct(p):""}</td>`;
+      }
+      html+=`<td class="pct total-td">${pFilt!==null?fmtPct(pFilt):""}</td></tr>`;
+    }
+  });
+
+  const tcvFilt=calcCVFiltrado();
+  html+=`<tr><td class="sticky cv-lbl">CV</td>`;
+  for(let d=0;d<n;d++){
+    const cv=calcCV(localData,d);
+    const fuera=(d<fd-1||d>fh-1)?" style='opacity:.35;'":"";
+    html+=`<td class="cv${(d+1)===today?" today-td":""}"${fuera}>${cv!==null?fmtPct(cv):""}</td>`;
+  }
+  html+=`<td class="cv total-td" style="color:#fbbf24">${tcvFilt!==null?fmtPct(tcvFilt):""}</td></tr>`;
+  html+=`</tbody></table></div>`;
+  if(container)container.innerHTML=html;
+  cargarYRenderizarMetas(zonaId,tiendaId);
+  cargarYRenderizarObjetivosCV(zonaId,tiendaId);
+}
+
+// ══ INPUT HANDLERS ════════════════════════════════════════════════════════════
+window.handleInput=function(el,zonaId,tiendaId){
+  const key=el.dataset.key,day=parseInt(el.dataset.day);
+  const val=el.value===""?"":parseFloat(el.value);
+  if(!localData[key])localData[key]=Array(daysIn(currentYM)).fill("");
+  localData[key][day]=val;
+  partialUpdate();renderKPIs();
+  const indObj=INDICATORS.find(i=>i.key===key);
+  if(key==="venta"||(indObj&&indObj.isCost)){
+    renderMetas(zonaId,tiendaId);
+    cargarYRenderizarObjetivosCV(zonaId,tiendaId);
+  }
+};
+window.handleBlur=function(el,zonaId,tiendaId){
+  clearTimeout(saveTimer);guardarDatos(zonaId,tiendaId);
+};
+
+function partialUpdate(){
+  const n=daysIn(currentYM);
+  const rows=document.querySelectorAll("#mainTable tbody tr");
+  let ri=0;
+  INDICATORS.forEach(ind=>{
+    ri++;
+    if(ind.isCost){
+      const pr=rows[ri];
+      if(pr){const cells=pr.querySelectorAll("td.pct");for(let d=0;d<n;d++){const p=pctFor(localData,ind.key,d);if(cells[d])cells[d].textContent=p!==null?fmtPct(p):"";}const tot=pr.querySelector("td.total-td");if(tot)tot.textContent=fmtPct(totalPctFor(localData,ind.key));}
+      ri++;
+    }
+    const vr=rows[ri-1-(ind.isCost?1:0)];
+    if(vr){const tot=vr.querySelector("td.total-td");if(tot){const tv=totalFor(localData,ind.key),has=(localData[ind.key]||[]).some(v=>v!=="");tot.textContent=has?fmt(tv):"";tot.style.color=tv<0?"#f87171":tv>0&&ind.isCost?"#86efac":"var(--total-text)";}}
+  });
+  const cvr=rows[ri];
+  if(cvr){const cells=cvr.querySelectorAll("td.cv");for(let d=0;d<n;d++){const cv=calcCV(localData,d);if(cells[d])cells[d].textContent=cv!==null?fmtPct(cv):"";}const tot=cvr.querySelector("td.total-td");const tcv=totalCV(localData);if(tot)tot.textContent=tcv!==null?fmtPct(tcv):"";}
+}
+
+async function guardarDatos(zonaId,tiendaId){
+  setSynced(false);
+  try{
+    await set(ref(db,cvPath(zonaId,tiendaId,currentYM)),localData);
+    document.getElementById("lastSaved").textContent="Guardado: "+new Date().toLocaleTimeString("es-PE");
+    setSynced(true);
+  }catch(e){setSynced(false,true);}
+}
+
+// ══ METAS ══════════════════════════════════════════════════════════════════════
+async function cargarYRenderizarMetas(zonaId,tiendaId){
+  const cont=document.getElementById("metasContainer");if(!cont)return;
+  try{const snap=await get(ref(db,metaPath(zonaId,tiendaId,currentYM)));metaActual=snap.exists()?snap.val():null;}catch(e){metaActual=null;}
+  renderMetas(zonaId,tiendaId);
+}
+function renderMetas(zonaId,tiendaId){
+  const cont=document.getElementById("metasContainer");if(!cont)return;
+  const n=daysIn(currentYM),today=todayDay(currentYM);
+  const fd=filtroDesde||1, fh=filtroHasta||n;
+  const filtroActivo=esFiltroActivo();
+  // Venta del rango filtrado
+  const ventaRango=totalFilt(localData,"venta");
+  // Venta de hoy (siempre día actual, sin filtro)
+  const ventaHoy=today>0?(parseF((localData.venta||[])[today-1])||0):null;
+  if(!metaActual||!metaActual.metaMensual){
+    cont.innerHTML=`<div class="metas-box"><div class="metas-header"><h3>🎯 Meta de ventas</h3><button class="metas-edit-btn" onclick="abrirMeta('${zonaId}','${tiendaId}')">➕ Definir meta</button></div><div class="metas-empty">Sin meta definida para este mes.</div></div>`;return;
+  }
+  const metaMensual=parseF(metaActual.metaMensual)||0;
+  const metaDiaria=metaActual.metaDiaria?parseF(metaActual.metaDiaria):(metaMensual/n);
+  // Meta proporcional al rango filtrado
+  const diasRango=fh-fd+1;
+  const metaRango=filtroActivo?(metaDiaria*diasRango):metaMensual;
+  const pctRango=metaRango>0?Math.min((ventaRango/metaRango)*100,999):0;
+  const faltaRango=Math.max(metaRango-ventaRango,0);
+  const cumplioRango=ventaRango>=metaRango&&metaRango>0;
+  const rangoLabel=filtroActivo?`Días ${fd}–${fh} (${diasRango} días)`:"del mes";
+  let diaHtml="";
+  if(today>0&&today>=fd&&today<=fh){
+    const pctDia=metaDiaria>0?Math.min(((ventaHoy||0)/metaDiaria)*100,999):0;
+    const faltaDia=Math.max(metaDiaria-(ventaHoy||0),0);
+    const cumplioDia=(ventaHoy||0)>=metaDiaria&&metaDiaria>0;
+    diaHtml=`<div class="meta-card"><div class="meta-lbl">Meta hoy (día ${today})</div><div class="meta-val">S/ ${fmt(ventaHoy||0)} <span style="color:var(--muted);font-weight:400;font-size:.8rem">/ ${fmt(metaDiaria)}</span></div><div class="meta-sub">${cumplioDia?`<span class="meta-cumplida">✓ Cumplida</span>`:`Falta <span class="meta-faltante">S/ ${fmt(faltaDia)}</span>`}</div><div class="meta-bar-track"><div class="meta-bar-fill" style="width:${Math.min(pctDia,100)}%;background:${cumplioDia?"#22c55e":"#3b82f6"}"></div></div></div>`;
+  }
+  cont.innerHTML=`<div class="metas-box"><div class="metas-header"><h3>🎯 Meta de ventas${filtroActivo?` <span style="font-size:.65rem;color:#a5b4fc;font-weight:400">· Días ${fd}–${fh}</span>`:""}</h3><button class="metas-edit-btn" onclick="abrirMeta('${zonaId}','${tiendaId}')">✏️ Editar</button></div><div class="metas-grid"><div class="meta-card"><div class="meta-lbl">Meta ${rangoLabel}</div><div class="meta-val">S/ ${fmt(ventaRango)} <span style="color:var(--muted);font-weight:400;font-size:.8rem">/ ${fmt(metaRango)}</span></div><div class="meta-sub">${cumplioRango?`<span class="meta-cumplida">✓ Cumplida</span>`:`Falta <span class="meta-faltante">S/ ${fmt(faltaRango)}</span> (${pctRango.toFixed(1)}%)`}</div><div class="meta-bar-track"><div class="meta-bar-fill" style="width:${Math.min(pctRango,100)}%;background:${cumplioRango?"#22c55e":"#3b82f6"}"></div></div></div>${diaHtml}</div></div>`;
+}
+window.abrirMeta=function(zonaId,tiendaId){
+  document.getElementById("metaTiendaId").value=`${zonaId}|${tiendaId}`;
+  document.getElementById("metaMensualInput").value=metaActual?.metaMensual||"";
+  document.getElementById("metaDiariaInput").value=metaActual?.metaDiaria||"";
+  document.getElementById("modalMeta").style.display="flex";
+};
+window.guardarMeta=async function(){
+  const parts=document.getElementById("metaTiendaId").value.split("|");
+  const [zonaId,tiendaId]=[parts[0],parts[1]];
+  const metaMensual=parseFloat(document.getElementById("metaMensualInput").value)||0;
+  const metaDiariaRaw=document.getElementById("metaDiariaInput").value;
+  const metaDiaria=metaDiariaRaw===""?null:(parseFloat(metaDiariaRaw)||0);
+  if(metaMensual<=0){alert("Ingresa una meta mensual válida.");return;}
+  const payload={metaMensual,metaDiaria};
+  try{await set(ref(db,metaPath(zonaId,tiendaId,currentYM)),payload);metaActual=payload;closeModal();renderMetas(zonaId,tiendaId);}
+  catch(e){alert("Error al guardar.");}
+};
+window.eliminarMeta=async function(){
+  const parts=document.getElementById("metaTiendaId").value.split("|");
+  if(!confirm("¿Eliminar la meta de este mes?"))return;
+  try{await remove(ref(db,metaPath(parts[0],parts[1],currentYM)));metaActual=null;closeModal();renderMetas(parts[0],parts[1]);}
+  catch(e){alert("Error al eliminar.");}
+};
+
+// ══ OBJETIVOS CV ═══════════════════════════════════════════════════════════════
+async function cargarYRenderizarObjetivosCV(zonaId,tiendaId){
+  const cont=document.getElementById("objCVContainer");if(!cont)return;
+  let obj={};
+  try{const snap=await get(ref(db,objPath(zonaId,tiendaId)));if(snap.exists())obj=snap.val();}catch(e){}
+  objTiendaCustom[tiendaId]=obj;
+  renderObjetivosCV(zonaId,tiendaId,obj);
+}
+function renderObjetivosCV(zonaId,tiendaId,objetivos){
+  const cont=document.getElementById("objCVContainer");if(!cont)return;
+  if(!Object.keys(objetivos).length){cont.innerHTML="";return;}
+  const fd=filtroDesde||1, fh=filtroHasta||daysIn(currentYM);
+  const filtroActivo=esFiltroActivo();
+  // Usar totales filtrados
+  const tv=totalFilt(localData,"venta");
+  const INDS=[{key:"receta",label:"Receta"},{key:"merma",label:"Merma"},{key:"refrigerio",label:"Refrigerio"},{key:"ci",label:"CI"},{key:"ajuste",label:"Ajuste"},{key:"aej",label:"AEJ"},{key:"cv",label:"CV Total"}];
+  let cards="";
+  INDS.forEach(ind=>{
+    if(objetivos[ind.key]===undefined||objetivos[ind.key]==="")return;
+    const target=parseFloat(objetivos[ind.key]);
+    let actual=ind.key==="cv"?totalCVFilt(localData):(tv?totalFilt(localData,ind.key)/tv:null);
+    const actualPct=actual!==null?Math.abs(actual)*100:null;
+    let status="nodata",badge="Sin datos";
+    if(actualPct!==null){
+      if(actualPct<=target){status="ok";badge=`✓ Dentro del objetivo (${actualPct.toFixed(2)}% / máx ${target.toFixed(2)}%)`;}
+      else{status="over";badge=`✗ Excedido en ${(actualPct-target).toFixed(2)}% (${actualPct.toFixed(2)}% / máx ${target.toFixed(2)}%)`;}
+    }
+    cards+=`<div class="obj-card ${status}"><div class="obj-lbl">${ind.label}</div><div class="obj-val">${actualPct!==null?actualPct.toFixed(2)+"%":"—"}</div><div class="obj-target">Obj. máx: ${target.toFixed(2)}%</div><span class="obj-badge ${status}">${badge}</span></div>`;
+  });
+  if(!cards){cont.innerHTML="";return;}
+  const filtroLabel=filtroActivo?` <span style="font-size:.65rem;color:#a5b4fc;font-weight:400">· Días ${fd}–${fh}</span>`:"";
+  cont.innerHTML=`<div class="obj-box"><div class="obj-header"><h3>📊 Seguimiento de objetivos CV${filtroLabel}</h3></div><div class="obj-grid">${cards}</div></div>`;
+}
+
+// ══ PANEL OBJETIVOS (pestaña zona admin) ══════════════════════════════════════
+async function renderPanelObjetivos(){
+  const ids=Object.keys(tiendas);
+  const snaps=await Promise.all(ids.map(id=>get(ref(db,objPath(session.zonaId,id)))));
+  ids.forEach((id,i)=>{objTiendaCustom[id]=snaps[i].exists()?snaps[i].val():{};});
+  let html=`<div class="actions"><div class="section-title" style="margin:0">Objetivos CV por tienda (% máximo)</div></div><div class="cards-grid">`;
+  if(!ids.length)html+=`<p style="color:var(--muted);font-size:.82rem">No hay tiendas.</p>`;
+  ids.forEach(id=>{
+    const custom=objTiendaCustom[id]||{},tieneCustom=Object.keys(custom).length>0;
+    const itemsDef=COST_INDICATORS.filter(ind=>custom[ind.key]!==undefined&&custom[ind.key]!=="");
+    html+=`<div class="card"><h3>🏪 ${tiendas[id].nombre}</h3>
+      <div class="card-sub" style="color:${tieneCustom?"#a5b4fc":"var(--muted)"};">${tieneCustom?"✓ Objetivos definidos":"Sin objetivos"}</div>
+      ${tieneCustom?`<div class="card-obj-grid">${itemsDef.map(ind=>`<div class="card-obj-row-label">${ind.label}</div><div class="card-obj-row-val">${parseFloat(custom[ind.key]).toFixed(2)}%</div>`).join("")}</div>`:""}
+      <div class="card-actions">
+        <button class="btn btn-ghost" onclick="abrirModalObjetivos('${id}')">✏️ ${tieneCustom?"Editar":"Definir"}</button>
+        ${tieneCustom?`<button class="btn btn-danger" onclick="eliminarObjetivosTienda('${id}')">🗑 Quitar</button>`:""}
+      </div>
+    </div>`;
+  });
+  html+=`</div>`;
+  document.getElementById("mainContent").innerHTML=html;
+}
+window.abrirModalObjetivos=function(tiendaId){
+  document.getElementById("objTiendaId").value=tiendaId;
+  const src=objTiendaCustom[tiendaId]||{},ids=Object.keys(tiendas);
+  let html=`<div style="margin-bottom:14px"><label style="font-size:.72rem;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase">Tienda</label>
+    <select id="objTiendaSel" onchange="cambiarTiendaObj()" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:.82rem;">
+      ${ids.map(id=>`<option value="${id}"${id===tiendaId?" selected":""}>${tiendas[id].nombre}</option>`).join("")}
+    </select></div>
+    <div class="obj-form-grid">
+      <div style="font-size:.68rem;color:var(--muted);font-weight:700;padding-bottom:4px;border-bottom:1px solid var(--border)">INDICADOR</div>
+      <div style="font-size:.68rem;color:var(--muted);font-weight:700;padding-bottom:4px;border-bottom:1px solid var(--border)">% MÁXIMO</div>`;
+  COST_INDICATORS.forEach(ind=>{
+    const val=src[ind.key]!==undefined&&src[ind.key]!==""?src[ind.key]:"";
+    html+=`<div class="obj-form-label">${ind.label}</div><input class="obj-form-input" type="number" step="0.01" min="0" max="200" id="objInput_${ind.key}" value="${val}" placeholder="Sin obj.">`;
+  });
+  html+=`</div>`;
+  document.getElementById("objFormContent").innerHTML=html;
+  document.getElementById("errorObjetivos").style.display="none";
+  document.getElementById("modalObjetivos").style.display="flex";
+};
+window.cambiarTiendaObj=function(){
+  const tid=document.getElementById("objTiendaSel").value;
+  document.getElementById("objTiendaId").value=tid;
+  const src=objTiendaCustom[tid]||{};
+  COST_INDICATORS.forEach(ind=>{const el=document.getElementById("objInput_"+ind.key);if(el)el.value=src[ind.key]!==undefined&&src[ind.key]!==""?src[ind.key]:"";});
+};
+window.guardarObjetivos=async function(){
+  const tiendaId=document.getElementById("objTiendaSel")?document.getElementById("objTiendaSel").value:document.getElementById("objTiendaId").value;
+  const err=document.getElementById("errorObjetivos");err.style.display="none";
+  const obj={};
+  COST_INDICATORS.forEach(ind=>{const el=document.getElementById("objInput_"+ind.key);if(el&&el.value!=="")obj[ind.key]=parseFloat(el.value)||0;});
+  try{
+    await set(ref(db,objPath(session.zonaId,tiendaId)),obj);
+    objTiendaCustom[tiendaId]=obj;
+    closeModal();renderPanelObjetivos();
+  }catch(e){err.textContent="Error al guardar.";err.style.display="block";}
+};
+window.eliminarObjetivosTienda=async function(id){
+  if(!confirm(`¿Quitar objetivos de "${tiendas[id]&&tiendas[id].nombre}"?`))return;
+  try{await remove(ref(db,objPath(session.zonaId,id)));delete objTiendaCustom[id];renderPanelObjetivos();}
+  catch(e){alert("Error al eliminar.");}
+};
+
+// ══ FILTRO DE RANGO DE DÍAS ═══════════════════════════════════════════════════
+window.aplicarFiltro=function(zonaId,tiendaId){
+  const n=daysIn(currentYM);
+  const desdeEl=document.getElementById("filtroDesdeInput");
+  const hastaEl=document.getElementById("filtroHastaInput");
+  if(!desdeEl||!hastaEl) return;
+  let fd=parseInt(desdeEl.value)||1;
+  let fh=parseInt(hastaEl.value)||n;
+  fd=Math.max(1,Math.min(fd,n));
+  fh=Math.max(fd,Math.min(fh,n));
+  desdeEl.value=fd; hastaEl.value=fh;
+  filtroDesde=fd; filtroHasta=fh;
+  const target=currentTab==="datos"?document.getElementById("tablaDatos"):document.getElementById("mainContent");
+  if(target) renderTabla(target,zonaId,tiendaId);
+};
+
+window.resetFiltro=function(zonaId,tiendaId){
+  filtroDesde=1; filtroHasta=daysIn(currentYM);
+  const target=currentTab==="datos"?document.getElementById("tablaDatos"):document.getElementById("mainContent");
+  if(target) renderTabla(target,zonaId,tiendaId);
+};
+
+window.aplicarFiltroResumen=function(){
+  const n=daysIn(currentYM);
+  const desdeEl=document.getElementById("filtroDesdeInput");
+  const hastaEl=document.getElementById("filtroHastaInput");
+  if(!desdeEl||!hastaEl) return;
+  let fd=parseInt(desdeEl.value)||1;
+  let fh=parseInt(hastaEl.value)||n;
+  fd=Math.max(1,Math.min(fd,n));
+  fh=Math.max(fd,Math.min(fh,n));
+  desdeEl.value=fd; hastaEl.value=fh;
+  filtroDesde=fd; filtroHasta=fh;
+  renderResumen();
+};
+
+window.resetFiltroResumen=function(){
+  filtroDesde=1; filtroHasta=daysIn(currentYM);
+  renderResumen();
+};
+
+// ══ EXPORTAR EXCEL ════════════════════════════════════════════════════════════
+function filasIndicadores(data,labels){
+  const rows=[["INDICADORES",...labels.map(l=>"Día "+l.num),"TOTAL MES"]];
+  INDICATORS.forEach(ind=>{
+    const vr=[ind.label,...labels.map((_,d)=>{const v=(data[ind.key]||[])[d];return v===""||v===null?"":parseF(v);}),totalFor(data,ind.key)];
+    rows.push(vr);
+    if(ind.isCost){const pr=[ind.key.toUpperCase()+" %",...labels.map((_,d)=>{const p=pctFor(data,ind.key,d);return p!==null?p:"";}),totalPctFor(data,ind.key)];rows.push(pr);}
+  });
+  const cvr=["CV",...labels.map((_,d)=>{const cv=calcCV(data,d);return cv!==null?cv:"";}),totalCV(data)];
+  rows.push(cvr);return rows;
+}
+window.exportarTiendaExcel=function(tiendaId,fdStr,fhStr){
+  const labels=dayLabels(currentYM);
+  const n=labels.length;
+  const fd=fdStr?parseInt(fdStr):1;
+  const fh=fhStr?parseInt(fhStr):n;
+  const labelsFilt=labels.filter(l=>l.num>=fd&&l.num<=fh);
+  const nombre=(tiendas[tiendaId]&&tiendas[tiendaId].nombre)||tiendaId;
+  // Datos filtrados por rango
+  const dataFilt={};
+  INDICATORS.forEach(ind=>{
+    dataFilt[ind.key]=(localData[ind.key]||[]).filter((_,i)=>i>=fd-1&&i<=fh-1);
+  });
+  const ws=XLSX.utils.aoa_to_sheet(filasIndicadores(dataFilt,labelsFilt));
+  ws["!cols"]=[{wch:22},...labelsFilt.map(()=>({wch:10})),{wch:12}];
+  const wb=XLSX.utils.book_new();
+  const sheetName=fd===1&&fh===n?"CV":`CV_Días_${fd}-${fh}`;
+  XLSX.utils.book_append_sheet(wb,ws,sheetName);
+  const sufijo=fd===1&&fh===n?"":`_días${fd}-${fh}`;
+  XLSX.writeFile(wb,`CV_${nombre.replace(/[^a-zA-Z0-9]/g,"_")}_${currentYM}${sufijo}.xlsx`);
+};
+window.exportarConsolidadoExcel=function(){
+  if(!ultimoConsolidado){alert("Carga primero el resumen consolidado.");return;}
+  const {ids,allData,cons,ym}=ultimoConsolidado,labels=dayLabels(ym);
+  const wb=XLSX.utils.book_new();
+  const resumen=[["Tienda","Venta","Receta","Receta%","Merma","Merma%","Refrigerio","Refrig.%","CI","CI%","Ajuste","Ajuste%","AEJ","AEJ%","CV%"]];
+  ids.forEach(id=>{const d=allData[id];resumen.push([(tiendas[id]&&tiendas[id].nombre)||id,totalFor(d,"venta"),totalFor(d,"receta"),totalPctFor(d,"receta"),totalFor(d,"merma"),totalPctFor(d,"merma"),totalFor(d,"refrigerio"),totalPctFor(d,"refrigerio"),totalFor(d,"ci"),totalPctFor(d,"ci"),totalFor(d,"ajuste"),totalPctFor(d,"ajuste"),totalFor(d,"aej"),totalPctFor(d,"aej"),totalCV(d)]);});
+  const wsR=XLSX.utils.aoa_to_sheet(resumen);XLSX.utils.book_append_sheet(wb,wsR,"Resumen");
+  ids.forEach(id=>{const nombre=((tiendas[id]&&tiendas[id].nombre)||id).substring(0,28).replace(/[\\/?*[\]:]/g,"_");const ws=XLSX.utils.aoa_to_sheet(filasIndicadores(allData[id],labels));XLSX.utils.book_append_sheet(wb,ws,nombre);});
+  const wsCons=XLSX.utils.aoa_to_sheet(filasIndicadores(cons,labels));XLSX.utils.book_append_sheet(wb,wsCons,"Consolidado");
+  XLSX.writeFile(wb,`CV_Consolidado_${ym}.xlsx`);
+};
+
+// ══ RESPALDO JSON ════════════════════════════════════════════════════════════
+function mostrarEstadoBackup(msg, tipo){
+  const el=document.getElementById("backupStatus");
+  if(!el) return;
+  el.textContent=msg;
+  el.className=`backup-status ${tipo}`;
+  el.style.display="block";
+  if(tipo==="ok") setTimeout(()=>{el.style.display="none";},4000);
+}
+
+window.exportarRespaldoJSON=async function(){
+  mostrarEstadoBackup("⏳ Exportando todos los datos…","loading");
+  try{
+    // Descargar todo desde Firebase
+    const snap=await get(ref(db,"/"));
+    if(!snap.exists()){mostrarEstadoBackup("No hay datos para exportar.","err");return;}
+    const datos=snap.val();
+    // Agregar metadatos del respaldo
+    const respaldo={
+      _meta:{
+        fechaExportacion:new Date().toISOString(),
+        version:"2.0",
+        app:"CV Dashboard",
+        exportadoPor:"Super Admin"
+      },
+      ...datos
+    };
+    const json=JSON.stringify(respaldo,null,2);
+    const blob=new Blob([json],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    const fecha=new Date().toISOString().slice(0,10); // YYYY-MM-DD
+    a.href=url;
+    a.download=`respaldo_CV_${fecha}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    mostrarEstadoBackup(`✅ Respaldo exportado: respaldo_CV_${fecha}.json`,"ok");
+  }catch(e){
+    console.error(e);
+    mostrarEstadoBackup("❌ Error al exportar. Verifica tu conexión.","err");
+  }
+};
+
+window.procesarImportJSON=async function(input){
+  const file=input.files[0];
+  if(!file) return;
+  // Resetear input para permitir volver a seleccionar el mismo archivo
+  input.value="";
+  if(!file.name.endsWith(".json")){
+    mostrarEstadoBackup("❌ Solo se aceptan archivos .json","err");return;
+  }
+  // Confirmación con advertencia clara
+  const confirmar=confirm(
+    `⚠️ IMPORTAR RESPALDO\n\n` +
+    `Archivo: ${file.name}\n\n` +
+    `Esto reemplazará TODOS los datos actuales (zonas, tiendas, datos CV, metas y objetivos) con los del archivo seleccionado.\n\n` +
+    `Esta acción NO se puede deshacer.\n\n` +
+    `¿Estás seguro que deseas continuar?`
+  );
+  if(!confirmar) return;
+
+  mostrarEstadoBackup("⏳ Importando datos… Por favor espera.","loading");
+  try{
+    const texto=await file.text();
+    let datos;
+    try{datos=JSON.parse(texto);}
+    catch(e){mostrarEstadoBackup("❌ Archivo JSON inválido o corrupto.","err");return;}
+
+    // Remover metadatos del respaldo antes de importar
+    const {_meta,...datosLimpios}=datos;
+
+    // Verificar que tenga la estructura correcta
+    if(!datosLimpios.zonas&&!datosLimpios.superconfig){
+      mostrarEstadoBackup("❌ El archivo no parece ser un respaldo válido de esta app.","err");return;
+    }
+
+    // Escribir en Firebase
+    await set(ref(db,"/"),datosLimpios);
+
+    // Recargar el estado local
+    const pinSnap=await get(ref(db,"superconfig/pinSuperAdmin"));
+    if(pinSnap.exists()) pinSuperAdmin=pinSnap.val();
+
+    const zonasSnap=await get(ref(db,"zonas"));
+    zonas={};
+    if(zonasSnap.exists()){
+      const raw=zonasSnap.val();
+      Object.keys(raw).forEach(zid=>{
+        zonas[zid]={nombre:raw[zid].nombre||zid,pin:raw[zid].pin||""};
+      });
+    }
+
+    mostrarEstadoBackup(`✅ Respaldo importado exitosamente desde "${file.name}". Datos restaurados.`,"ok");
+    // Re-renderizar el panel
+    setTimeout(()=>renderSuperAdmin(),1500);
+
+  }catch(e){
+    console.error(e);
+    mostrarEstadoBackup("❌ Error al importar. Verifica tu conexión y el archivo.","err");
+  }
+};
+
+// ══ CLOSE MODAL ═══════════════════════════════════════════════════════════════
+window.closeModal=function(){
+  ["modalZona","modalTienda","modalEliminar","modalCambiarPin","modalMeta","modalObjetivos"].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display="none";
+  });
+};
+
+// ── Arranque ──────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
