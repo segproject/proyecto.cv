@@ -404,7 +404,7 @@ const COST_INDICATORS=[
 // ── Estado global ─────────────────────────────────────────────────────────────
 let pinSuperAdmin=PIN_SUPER_ADMIN_DEFAULT;
 let session=null; // {role:'superadmin'|'zonaadmin'|'tienda', zonaId?, tiendaId?, tiendaNombre?}
-let currentYM="2026-06";
+let currentYM=(()=>{const h=new Date();let y=h.getFullYear();if(y<ANIO_MIN)y=ANIO_MIN;if(y>ANIO_MAX)y=ANIO_MAX;return y+"-"+String(h.getMonth()+1).padStart(2,"0");})(); // mes actual al abrir
 let zonas={}; // {zonaId:{nombre,pin}}
 let tiendas={}; // tiendas de la zona activa
 let localData={};
