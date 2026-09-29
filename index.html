@@ -225,6 +225,52 @@ footer{text-align:center;padding:10px;font-size:.65rem;color:var(--muted);border
   .btn-logout,.tab,button.btn{min-height:38px;}
   select{min-height:38px;}
 }
+
+/* CERTIFICADOS */
+.cert-filter{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.cert-filter input{flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:7px;font-size:.8rem;outline:none;}
+.cert-filter input:focus{border-color:var(--accent);}
+.cert-filter select{padding:8px 10px;font-size:.78rem;}
+.cert-table td{padding:9px 10px;white-space:normal;font-size:.76rem;}
+.cert-table th:first-child{min-width:180px;}
+.cert-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;border:1px solid;white-space:nowrap;}
+.cert-badge.vencido{background:rgba(239,68,68,.12);color:#f87171;border-color:rgba(239,68,68,.35);}
+.cert-badge.proximo-7{background:rgba(249,115,22,.12);color:#fb923c;border-color:rgba(249,115,22,.35);}
+.cert-badge.proximo-15{background:rgba(245,158,11,.12);color:#fbbf24;border-color:rgba(245,158,11,.35);}
+.cert-badge.vigente{background:rgba(34,197,94,.12);color:#22c55e;border-color:rgba(34,197,94,.35);}
+.cert-dias{font-weight:700;white-space:nowrap;}
+.cert-dias.vencido{color:#f87171;}.cert-dias.proximo-7{color:#fb923c;}.cert-dias.proximo-15{color:#fbbf24;}.cert-dias.vigente{color:#22c55e;}.cert-dias.nofecha{color:var(--muted);font-weight:400;}
+.cert-acc{display:flex;gap:6px;}
+.cert-acc button.btn{padding:4px 10px;min-height:30px;}
+#modalCert .form-group input,#modalCert .form-group select{letter-spacing:normal;font-weight:500;width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:7px;font-size:16px;outline:none;}
+#modalCert .form-group input:focus,#modalCert .form-group select:focus{border-color:var(--accent);}
+
+/* TICKETS */
+.tk-badge{display:inline-block;min-width:17px;padding:1px 6px;margin-left:5px;border-radius:10px;background:#ef4444;color:#fff;font-size:.62rem;font-weight:800;text-align:center;line-height:1.4;}
+.tk-toast{position:fixed;top:14px;right:14px;z-index:1200;max-width:320px;background:var(--surface);border:1px solid var(--accent);border-left:4px solid #ef4444;border-radius:10px;padding:12px 16px;box-shadow:0 12px 32px rgba(0,0,0,.6);font-size:.78rem;line-height:1.5;cursor:pointer;display:none;}
+.tk-toast span{color:var(--muted);font-size:.68rem;}
+.tk-msg{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:1200;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 18px;font-size:.78rem;box-shadow:0 10px 28px rgba(0,0,0,.5);max-width:90%;text-align:center;}
+.cert-badge.tk-abierto{background:rgba(59,130,246,.12);color:#60a5fa;border-color:rgba(59,130,246,.35);}
+.cert-badge.tk-en_proceso{background:rgba(245,158,11,.12);color:#fbbf24;border-color:rgba(245,158,11,.35);}
+.cert-badge.tk-resuelto{background:rgba(34,197,94,.12);color:#22c55e;border-color:rgba(34,197,94,.35);}
+.cert-badge.tk-cerrado{background:rgba(100,116,139,.15);color:#94a3b8;border-color:rgba(100,116,139,.35);}
+.cert-badge.tkp-baja{background:rgba(100,116,139,.15);color:#94a3b8;border-color:rgba(100,116,139,.35);}
+.cert-badge.tkp-media{background:rgba(59,130,246,.12);color:#60a5fa;border-color:rgba(59,130,246,.35);}
+.cert-badge.tkp-alta{background:rgba(249,115,22,.12);color:#fb923c;border-color:rgba(249,115,22,.35);}
+.cert-badge.tkp-urgente{background:rgba(239,68,68,.15);color:#f87171;border-color:rgba(239,68,68,.4);}
+tr.tk-unread td{font-weight:700;background:rgba(59,130,246,.06);}
+.tk-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#3b82f6;margin-right:6px;}
+.tk-code{font-family:monospace;font-weight:700;color:#a5b4fc;letter-spacing:.04em;}
+.tk-meta{font-size:.72rem;color:var(--muted);margin:8px 0 12px;line-height:1.8;}
+.tk-desc{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:.82rem;line-height:1.6;margin-bottom:14px;word-break:break-word;}
+.tk-resp{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:8px;padding:12px 14px;font-size:.82rem;line-height:1.6;word-break:break-word;}
+.tk-resp label{display:block;font-size:.66rem;color:#22c55e;text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:4px;}
+#modalTicket .form-group input,#modalTicket .form-group select,#modalTicket .form-group textarea,
+#modalTicketDet .form-group select,#modalTicketDet .form-group textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:7px;font-size:16px;outline:none;font-family:inherit;letter-spacing:normal;font-weight:500;}
+#modalTicket .form-group input:focus,#modalTicket .form-group select:focus,#modalTicket .form-group textarea:focus,
+#modalTicketDet .form-group select:focus,#modalTicketDet .form-group textarea:focus{border-color:var(--accent);}
+#modalTicket textarea,#modalTicketDet textarea{resize:vertical;}
+#modalTicketDet .modal{max-height:90vh;overflow-y:auto;}
 </style>
 </head>
 <body>
@@ -359,6 +405,41 @@ footer{text-align:center;padding:10px;font-size:.65rem;color:var(--muted);border
   </div>
 </div>
 
+<div class="modal-overlay" id="modalCert" style="display:none;">
+  <div class="modal">
+    <h2 id="modalCertTitle">&#128196; Nuevo certificado</h2>
+    <input type="hidden" id="certEditId">
+    <div class="form-group"><label>Nombre del certificado *</label><input type="text" id="certNombre" placeholder="Ej: Certificado de fumigaci&oacute;n" maxlength="80"></div>
+    <div class="form-group"><label>Fecha de vencimiento</label><input type="date" id="certVencimiento"></div>
+    <div class="form-group"><label>Supervisor</label><input type="text" id="certSupervisor" placeholder="Nombre del responsable" maxlength="60"></div>
+    <div class="form-group"><label>Tienda</label><select id="certTienda"></select></div>
+    <div class="modal-error" id="errorCert"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarCert()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalTicket" style="display:none;">
+  <div class="modal">
+    <h2>&#127915; Nuevo ticket</h2>
+    <div class="form-group"><label>Categor&iacute;a</label><select id="tkCategoria"></select></div>
+    <div class="form-group"><label>Prioridad</label><select id="tkPrioridad"></select></div>
+    <div class="form-group"><label>T&iacute;tulo *</label><input type="text" id="tkTitulo" maxlength="80" placeholder="Ej: La freidora no enciende"></div>
+    <div class="form-group"><label>Descripci&oacute;n *</label><textarea id="tkDescripcion" rows="4" maxlength="800" placeholder="Describe el problema o la solicitud con el mayor detalle posible"></textarea></div>
+    <div class="modal-error" id="errorTicket"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardarTicket" onclick="guardarTicket()">Enviar ticket</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalTicketDet" style="display:none;">
+  <div class="modal" style="max-width:520px;" id="ticketDetBody"></div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, get, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -386,16 +467,12 @@ const INDICATORS=[
   {key:"venta",label:"VENTA",isCost:false},
   {key:"receta",label:"RECETA ( 951 )",isCost:true},
   {key:"merma",label:"MERMA ( 957, 958 )",isCost:true},
-  {key:"refrigerio",label:"REFRIGERIO (967,968)",isCost:true},
-  {key:"ci",label:"CI ( 975, 976 )",isCost:true},
   {key:"ajuste",label:"AJUSTE ( 701,702 )",isCost:true},
   {key:"aej",label:"AEJ ( 955,956 )",isCost:true},
 ];
 const COST_INDICATORS=[
   {key:"receta",label:"Receta ( 951 )"},
   {key:"merma",label:"Merma ( 957, 958 )"},
-  {key:"refrigerio",label:"Refrigerio (967,968)"},
-  {key:"ci",label:"CI ( 975, 976 )"},
   {key:"ajuste",label:"Ajuste ( 701,702 )"},
   {key:"aej",label:"AEJ ( 955,956 )"},
   {key:"cv",label:"CV Total"},
@@ -431,8 +508,8 @@ function emptyData(ym){const n=daysIn(ym),o={};INDICATORS.forEach(i=>{o[i.key]=A
 function totalFor(d,k){return(d[k]||[]).reduce((a,v)=>a+(parseF(v)||0),0);}
 function pctFor(d,k,i){const v=parseF((d.venta||[])[i]),c=parseF((d[k]||[])[i]);return(!v||c===null)?null:c/v;}
 function totalPctFor(d,k){const tv=totalFor(d,"venta");return tv?totalFor(d,k)/tv:null;}
-function calcCV(d,i){const v=parseF((d.venta||[])[i]);if(!v)return null;return["receta","merma","refrigerio","ci","ajuste","aej"].reduce((a,k)=>a+(parseF((d[k]||[])[i])/v||0),0);}
-function totalCV(d){const tv=totalFor(d,"venta");if(!tv)return null;return["receta","merma","refrigerio","ci","ajuste","aej"].reduce((a,k)=>a+(totalFor(d,k)/tv||0),0);}
+function calcCV(d,i){const v=parseF((d.venta||[])[i]);if(!v)return null;return["receta","merma","ajuste","aej"].reduce((a,k)=>a+(parseF((d[k]||[])[i])/v||0),0);}
+function totalCV(d){const tv=totalFor(d,"venta");if(!tv)return null;return["receta","merma","ajuste","aej"].reduce((a,k)=>a+(totalFor(d,k)/tv||0),0);}
 
 // Versiones filtradas por rango de días (usan filtroDesde/filtroHasta globales)
 function totalFilt(d,k){
@@ -440,7 +517,7 @@ function totalFilt(d,k){
   return(d[k]||[]).reduce((a,v,i)=>i<fd||i>fh?a:a+(parseF(v)||0),0);
 }
 function totalPctFilt(d,k){const tv=totalFilt(d,"venta");return tv?totalFilt(d,k)/tv:null;}
-function totalCVFilt(d){const tv=totalFilt(d,"venta");if(!tv)return null;return["receta","merma","refrigerio","ci","ajuste","aej"].reduce((a,k)=>a+(totalFilt(d,k)/tv||0),0);}
+function totalCVFilt(d){const tv=totalFilt(d,"venta");if(!tv)return null;return["receta","merma","ajuste","aej"].reduce((a,k)=>a+(totalFilt(d,k)/tv||0),0);}
 function hasDatosFilt(d,k){const fd=(filtroDesde||1)-1,fh=(filtroHasta||daysIn(currentYM))-1;return(d[k]||[]).some((v,i)=>i>=fd&&i<=fh&&v!=="");}
 function esFiltroActivo(){const n=daysIn(currentYM);return filtroDesde!==null&&filtroHasta!==null&&(filtroDesde!==1||filtroHasta!==n);}
 function genId(prefix){return(prefix||"id")+"-"+Date.now().toString(36);}
@@ -520,7 +597,7 @@ async function buscarTiendaEnZonas(pin){
 }
 
 window.doLogout=function(){
-  session=null;localData={};tiendas={};currentTab="resumen";
+  detenerTickets();session=null;localData={};tiendas={};certificados={};currentTab="resumen";
   if(dbListener){dbListener();dbListener=null;}
   document.getElementById("appScreen").style.display="none";
   document.getElementById("loginScreen").style.display="flex";
@@ -550,6 +627,7 @@ async function startApp(){
     tiendas=snap.exists()?snap.val():{};
     document.getElementById("appTabs").style.display="flex";
     renderZonaAdminTabs();
+    iniciarTickets();
     switchTab("resumen");
   } else {
     // Tienda
@@ -557,8 +635,10 @@ async function startApp(){
     document.getElementById("headerSub").textContent="Ingreso de datos";
     document.getElementById("yearSel").style.display="";
     document.getElementById("monthSel").style.display="";
-    document.getElementById("appTabs").style.display="none";
-    suscribirDatosTienda(session.zonaId,session.tiendaId);
+    document.getElementById("appTabs").style.display="flex";
+    renderTiendaTabs();
+    iniciarTickets();
+    switchTab("tdatos");
   }
 }
 
@@ -581,7 +661,7 @@ window.changeMonth=function(){
   if(session.role==="zonaadmin"){
     if(currentTab==="resumen")renderResumen();
     else if(currentTab==="datos"&&adminVerTiendaId)suscribirDatosTienda(session.zonaId,adminVerTiendaId,true);
-  } else if(session.role==="tienda"){
+  } else if(session.role==="tienda"&&currentTab==="tdatos"){
     suscribirDatosTienda(session.zonaId,session.tiendaId);
   }
 };
@@ -703,6 +783,18 @@ function renderZonaAdminTabs(){
     {id:"tiendas",label:"🏪 Mis tiendas"},
     {id:"datos",label:"📋 Ver tienda"},
     {id:"objetivos",label:"🎯 Objetivos CV"},
+    {id:"certificados",label:"📄 Certificados"},
+    {id:"tickets",label:"\ud83c\udfab Tickets <span class=\"tk-badge\" id=\"tkBadge\" style=\"display:none\"></span>"},
+  ];
+  document.getElementById("appTabs").innerHTML=tabs.map(t=>`<div class="tab" id="tab-${t.id}" onclick="switchTab('${t.id}')">${t.label}</div>`).join("");
+  actualizarBadgeTickets();
+}
+
+function renderTiendaTabs(){
+  const tabs=[
+    {id:"tdatos",label:"\ud83d\udcdd Ingreso de datos"},
+    {id:"certificados",label:"\ud83d\udcc4 Certificados"},
+    {id:"tickets",label:"\ud83c\udfab Tickets"},
   ];
   document.getElementById("appTabs").innerHTML=tabs.map(t=>`<div class="tab" id="tab-${t.id}" onclick="switchTab('${t.id}')">${t.label}</div>`).join("");
 }
@@ -715,9 +807,20 @@ window.switchTab=function(tab){
   if(dbListener){dbListener();dbListener=null;}
   document.getElementById("mainContent").innerHTML="";
   document.getElementById("kpiStrip").innerHTML="";
+  if(session.role==="tienda"){
+    const vis=tab==="tdatos"?"":"none";
+    document.getElementById("yearSel").style.display=vis;
+    document.getElementById("monthSel").style.display=vis;
+    if(tab==="certificados")renderCertificados();
+    else if(tab==="tickets")renderTickets();
+    else suscribirDatosTienda(session.zonaId,session.tiendaId);
+    return;
+  }
   if(tab==="resumen")renderResumen();
   else if(tab==="tiendas")renderGestionTiendas();
   else if(tab==="objetivos")renderPanelObjetivos();
+  else if(tab==="certificados")renderCertificados();
+  else if(tab==="tickets")renderTickets();
   else renderVerTienda();
 };
 
@@ -743,7 +846,7 @@ async function renderResumen(){
   // Usar funciones filtradas para el consolidado
   function tFilt(d,k){const f=fd-1,t=fh-1;return(d[k]||[]).reduce((a,v,i)=>i<f||i>t?a:a+(parseF(v)||0),0);}
   function pFilt(d,k){const tv=tFilt(d,"venta");return tv?tFilt(d,k)/tv:null;}
-  function cvFilt(d){const tv=tFilt(d,"venta");if(!tv)return null;return["receta","merma","refrigerio","ci","ajuste","aej"].reduce((a,k)=>a+(tFilt(d,k)/tv||0),0);}
+  function cvFilt(d){const tv=tFilt(d,"venta");if(!tv)return null;return["receta","merma","ajuste","aej"].reduce((a,k)=>a+(tFilt(d,k)/tv||0),0);}
 
   const tv=tFilt(cons,"venta"),tcv=cvFilt(cons);
   const filtroTag=filtroActivo?` <span style="font-size:.6rem;color:#a5b4fc;background:rgba(99,102,241,.15);border-radius:4px;padding:1px 6px">Días ${fd}–${fh}</span>`:"";
@@ -753,8 +856,6 @@ async function renderResumen(){
     <div class="kpi"><div class="lbl">Venta Consolidada${filtroTag}</div><div class="val" style="color:#3b82f6">S/ ${tv?fmt(tv):"—"}</div><div class="sub">${ids.length} tiendas</div></div>
     <div class="kpi"><div class="lbl">Receta</div><div class="val" style="color:#ef4444">${fmt(tFilt(cons,"receta"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"receta"))}</div></div>
     <div class="kpi"><div class="lbl">Merma</div><div class="val" style="color:#ef4444">${fmt(tFilt(cons,"merma"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"merma"))}</div></div>
-    <div class="kpi"><div class="lbl">Refrigerio</div><div class="val" style="color:#ef4444">${fmt(tFilt(cons,"refrigerio"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"refrigerio"))}</div></div>
-    <div class="kpi"><div class="lbl">CI</div><div class="val" style="color:#ef4444">${fmt(tFilt(cons,"ci"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"ci"))}</div></div>
     <div class="kpi"><div class="lbl">Ajuste</div><div class="val" style="color:${tFilt(cons,"ajuste")<0?"#ef4444":"#22c55e"}">${fmt(tFilt(cons,"ajuste"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"ajuste"))}</div></div>
     <div class="kpi"><div class="lbl">AEJ</div><div class="val" style="color:#22c55e">${fmt(tFilt(cons,"aej"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"aej"))}</div></div>
     <div class="kpi"><div class="lbl">CV Total</div><div class="val" style="color:#f59e0b">${tcv!==null?fmtPct(tcv):"—"}</div><div class="sub">% sobre venta</div></div>`;
@@ -780,8 +881,6 @@ async function renderResumen(){
       <th>Tienda</th><th>Venta Total</th>
       <th>Receta</th><th>Receta%</th>
       <th>Merma</th><th>Merma%</th>
-      <th>Refrigerio</th><th>Refrig.%</th>
-      <th>CI</th><th>CI%</th>
       <th>Ajuste</th><th>Ajuste%</th>
       <th>AEJ</th><th>AEJ%</th>
       <th>CV%</th>
@@ -793,8 +892,6 @@ async function renderResumen(){
       <td style="color:#3b82f6;font-weight:700">${fmt(tFilt(d,"venta"))||"—"}</td>
       <td style="color:#f87171">${fmt(tFilt(d,"receta"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(d,"receta"))}</td>
       <td style="color:#f87171">${fmt(tFilt(d,"merma"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(d,"merma"))}</td>
-      <td style="color:#f87171">${fmt(tFilt(d,"refrigerio"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(d,"refrigerio"))}</td>
-      <td style="color:#f87171">${fmt(tFilt(d,"ci"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(d,"ci"))}</td>
       <td>${fmt(tFilt(d,"ajuste"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(d,"ajuste"))}</td>
       <td style="color:#86efac">${fmt(tFilt(d,"aej"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(d,"aej"))}</td>
       <td style="color:#fbbf24;font-weight:700">${cv2!==null?fmtPct(cv2):"—"}</td>
@@ -805,8 +902,6 @@ async function renderResumen(){
     <td style="color:#3b82f6">${fmt(tv)||"—"}</td>
     <td style="color:#f87171">${fmt(tFilt(cons,"receta"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"receta"))}</td>
     <td style="color:#f87171">${fmt(tFilt(cons,"merma"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"merma"))}</td>
-    <td style="color:#f87171">${fmt(tFilt(cons,"refrigerio"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"refrigerio"))}</td>
-    <td style="color:#f87171">${fmt(tFilt(cons,"ci"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"ci"))}</td>
     <td>${fmt(tFilt(cons,"ajuste"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"ajuste"))}</td>
     <td style="color:#86efac">${fmt(tFilt(cons,"aej"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"aej"))}</td>
     <td style="color:#fbbf24">${tcv!==null?fmtPct(tcv):"—"}</td>
@@ -823,10 +918,10 @@ async function renderVisualCV(ids,allData){
   const fd=(filtroDesde||1)-1, fh=(filtroHasta||daysIn(currentYM))-1;
   function calcPctFilt(data,key){
     const reduce=(k)=>(data[k]||[]).reduce((a,v,i)=>i<fd||i>fh?a:a+(parseF(v)||0),0);
-    if(key==="cv"){const tv=reduce("venta");if(!tv)return null;return["receta","merma","refrigerio","ci","ajuste","aej"].reduce((a,k)=>a+(reduce(k)/tv||0),0);}
+    if(key==="cv"){const tv=reduce("venta");if(!tv)return null;return["receta","merma","ajuste","aej"].reduce((a,k)=>a+(reduce(k)/tv||0),0);}
     const tv=reduce("venta");return tv?reduce(key)/tv:null;
   }
-  const INDS=[{key:"receta",label:"Receta"},{key:"merma",label:"Merma"},{key:"refrigerio",label:"Refrigerio"},{key:"ci",label:"CI"},{key:"ajuste",label:"Ajuste"},{key:"aej",label:"AEJ"},{key:"cv",label:"CV Total"}];
+  const INDS=[{key:"receta",label:"Receta"},{key:"merma",label:"Merma"},{key:"ajuste",label:"Ajuste"},{key:"aej",label:"AEJ"},{key:"cv",label:"CV Total"}];
   let thead=`<tr><th>Tienda</th>`;
   INDS.forEach(ind=>{thead+=`<th>${ind.label}</th>`;});
   thead+=`</tr>`;
@@ -1049,8 +1144,6 @@ function renderKPIs(){
     <div class="kpi"><div class="lbl">Venta Total${filtroLabel}</div><div class="val" style="color:#3b82f6">S/ ${tv?fmt(tv):"—"}</div><div class="sub">${entered} días</div></div>
     <div class="kpi"><div class="lbl">Receta</div><div class="val" style="color:#ef4444">${fmt(totalFilt(localData,"receta"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"receta"))}</div></div>
     <div class="kpi"><div class="lbl">Merma</div><div class="val" style="color:#ef4444">${fmt(totalFilt(localData,"merma"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"merma"))}</div></div>
-    <div class="kpi"><div class="lbl">Refrigerio</div><div class="val" style="color:#ef4444">${fmt(totalFilt(localData,"refrigerio"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"refrigerio"))}</div></div>
-    <div class="kpi"><div class="lbl">CI</div><div class="val" style="color:#ef4444">${fmt(totalFilt(localData,"ci"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"ci"))}</div></div>
     <div class="kpi"><div class="lbl">Ajuste</div><div class="val" style="color:${totalFilt(localData,"ajuste")<0?"#ef4444":"#22c55e"}">${fmt(totalFilt(localData,"ajuste"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"ajuste"))}</div></div>
     <div class="kpi"><div class="lbl">AEJ</div><div class="val" style="color:#22c55e">${fmt(totalFilt(localData,"aej"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"aej"))}</div></div>
     <div class="kpi"><div class="lbl">CV Total</div><div class="val" style="color:#f59e0b">${tcv!==null?fmtPct(tcv):"—"}</div><div class="sub">% sobre venta</div></div>`;
@@ -1081,7 +1174,7 @@ function renderTabla(container,zonaId,tiendaId){
   function calcCVFiltrado(){
     const tv=totalFiltrado("venta");
     if(!tv) return null;
-    return ["receta","merma","refrigerio","ci","ajuste","aej"].reduce((a,k)=>a+(totalFiltrado(k)/tv||0),0);
+    return ["receta","merma","ajuste","aej"].reduce((a,k)=>a+(totalFiltrado(k)/tv||0),0);
   }
   const esFiltrado=fd!==1||fh!==n;
 
@@ -1273,7 +1366,7 @@ function renderObjetivosCV(zonaId,tiendaId,objetivos){
   const filtroActivo=esFiltroActivo();
   // Usar totales filtrados
   const tv=totalFilt(localData,"venta");
-  const INDS=[{key:"receta",label:"Receta"},{key:"merma",label:"Merma"},{key:"refrigerio",label:"Refrigerio"},{key:"ci",label:"CI"},{key:"ajuste",label:"Ajuste"},{key:"aej",label:"AEJ"},{key:"cv",label:"CV Total"}];
+  const INDS=[{key:"receta",label:"Receta"},{key:"merma",label:"Merma"},{key:"ajuste",label:"Ajuste"},{key:"aej",label:"AEJ"},{key:"cv",label:"CV Total"}];
   let cards="";
   INDS.forEach(ind=>{
     if(objetivos[ind.key]===undefined||objetivos[ind.key]==="")return;
@@ -1432,8 +1525,8 @@ window.exportarConsolidadoExcel=function(){
   if(!ultimoConsolidado){alert("Carga primero el resumen consolidado.");return;}
   const {ids,allData,cons,ym}=ultimoConsolidado,labels=dayLabels(ym);
   const wb=XLSX.utils.book_new();
-  const resumen=[["Tienda","Venta","Receta","Receta%","Merma","Merma%","Refrigerio","Refrig.%","CI","CI%","Ajuste","Ajuste%","AEJ","AEJ%","CV%"]];
-  ids.forEach(id=>{const d=allData[id];resumen.push([(tiendas[id]&&tiendas[id].nombre)||id,totalFor(d,"venta"),totalFor(d,"receta"),totalPctFor(d,"receta"),totalFor(d,"merma"),totalPctFor(d,"merma"),totalFor(d,"refrigerio"),totalPctFor(d,"refrigerio"),totalFor(d,"ci"),totalPctFor(d,"ci"),totalFor(d,"ajuste"),totalPctFor(d,"ajuste"),totalFor(d,"aej"),totalPctFor(d,"aej"),totalCV(d)]);});
+  const resumen=[["Tienda","Venta","Receta","Receta%","Merma","Merma%","Ajuste","Ajuste%","AEJ","AEJ%","CV%"]];
+  ids.forEach(id=>{const d=allData[id];resumen.push([(tiendas[id]&&tiendas[id].nombre)||id,totalFor(d,"venta"),totalFor(d,"receta"),totalPctFor(d,"receta"),totalFor(d,"merma"),totalPctFor(d,"merma"),totalFor(d,"ajuste"),totalPctFor(d,"ajuste"),totalFor(d,"aej"),totalPctFor(d,"aej"),totalCV(d)]);});
   const wsR=XLSX.utils.aoa_to_sheet(resumen);XLSX.utils.book_append_sheet(wb,wsR,"Resumen");
   ids.forEach(id=>{const nombre=((tiendas[id]&&tiendas[id].nombre)||id).substring(0,28).replace(/[\\/?*[\]:]/g,"_");const ws=XLSX.utils.aoa_to_sheet(filasIndicadores(allData[id],labels));XLSX.utils.book_append_sheet(wb,ws,nombre);});
   const wsCons=XLSX.utils.aoa_to_sheet(filasIndicadores(cons,labels));XLSX.utils.book_append_sheet(wb,wsCons,"Consolidado");
@@ -1546,12 +1639,446 @@ window.procesarImportJSON=async function(input){
 
 // ══ CLOSE MODAL ═══════════════════════════════════════════════════════════════
 window.closeModal=function(){
-  ["modalZona","modalTienda","modalEliminar","modalCambiarPin","modalMeta","modalObjetivos"].forEach(id=>{
+  ["modalZona","modalTienda","modalEliminar","modalCambiarPin","modalMeta","modalObjetivos","modalCert","modalTicket","modalTicketDet"].forEach(id=>{
     const el=document.getElementById(id);if(el)el.style.display="none";
   });
 };
 
 // ── Arranque ──────────────────────────────────────────────────────────────────
+// -- CERTIFICADOS ---------------------------------------------------------
+const PERU_TZ="America/Lima";
+let certificados={};
+function certPath(zonaId){return`zonas/${zonaId}/certificados`;}
+function certHoy(){const d=new Date(new Date().toLocaleString("en-US",{timeZone:PERU_TZ}));d.setHours(0,0,0,0);return d;}
+function certDias(v){if(!v||v==="N/A")return null;return Math.ceil((new Date(v+"T00:00:00")-certHoy())/86400000);}
+function certEstado(v){const d=certDias(v);if(d===null)return"vigente";if(d<0)return"vencido";if(d<=7)return"proximo-7";if(d<=15)return"proximo-15";return"vigente";}
+function certFecha(v){if(!v||v==="N/A")return"N/A";return new Date(v+"T00:00:00").toLocaleDateString("es-PE");}
+function escCert(t){return String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function puedeEditarCert(c){
+  if(!session)return false;
+  if(session.role==="zonaadmin")return true;
+  if(session.role==="tienda")return !!c&&!!c.tiendaId&&c.tiendaId===session.tiendaId;
+  return false;
+}
+function certTiendaNombre(c){return(c.tiendaId&&tiendas[c.tiendaId]?tiendas[c.tiendaId].nombre:c.tienda)||"General";}
+
+function renderCertificados(){
+  const esT=session.role==="tienda";
+  document.getElementById("mainContent").innerHTML=`
+    <div class="actions">
+      <div class="section-title" style="margin:0" id="certCount"></div>
+      <button class="btn btn-primary" onclick="abrirModalCert()">&#10133; Nuevo certificado</button>
+    </div>
+    <div class="cert-filter">
+      <input type="text" id="certFiltroTxt" placeholder="&#128269; Buscar certificado..." oninput="pintarCertificados()">
+      <select id="certFiltroEstado" onchange="pintarCertificados()">
+        <option value="">Todos los estados</option>
+        <option value="vencido">Vencido</option>
+        <option value="proximo-7">Pr&oacute;ximo 7 d&iacute;as</option>
+        <option value="proximo-15">Pr&oacute;ximo 15 d&iacute;as</option>
+        <option value="vigente">Vigente</option>
+      </select>
+      <select id="certFiltroTienda" onchange="pintarCertificados()"${esT?' style="display:none"':""}>
+        <option value="">Todas las tiendas</option>
+        <option value="__general">General</option>
+        ${Object.entries(tiendas).map(([id,t])=>`<option value="${id}">${escCert(t.nombre)}</option>`).join("")}
+      </select>
+    </div>
+    <div class="table-wrap"><table class="cert-table"><thead><tr>
+      <th>Certificado</th><th>Vencimiento</th><th>D&iacute;as restantes</th><th>Supervisor</th><th>Tienda</th><th>Estado</th><th>Acciones</th>
+    </tr></thead><tbody id="certTbody"></tbody></table></div>`;
+  dbListener=onValue(ref(db,certPath(session.zonaId)),snap=>{
+    certificados=snap.exists()?snap.val():{};
+    pintarCertificados();
+    setSynced(true);
+  },()=>setSynced(false,true));
+}
+
+window.pintarCertificados=function(){
+  const tbody=document.getElementById("certTbody");
+  if(!tbody)return;
+  const esT=session.role==="tienda";
+  const all=Object.entries(certificados).filter(([,c])=>!esT||!c.tiendaId||c.tiendaId===session.tiendaId);
+  const venc=all.filter(([,c])=>certEstado(c.vencimiento)==="vencido").length;
+  const p7=all.filter(([,c])=>{const d=certDias(c.vencimiento);return d!==null&&d>=0&&d<=7;}).length;
+  const p15=all.filter(([,c])=>{const d=certDias(c.vencimiento);return d!==null&&d>7&&d<=15;}).length;
+  document.getElementById("kpiStrip").innerHTML=`
+    <div class="kpi"><div class="lbl">Total certificados</div><div class="val">${all.length}</div></div>
+    <div class="kpi"><div class="lbl">Vencidos</div><div class="val" style="color:${venc?"#f87171":"var(--text)"}">${venc}</div></div>
+    <div class="kpi"><div class="lbl">Vencen en 7 d&iacute;as o menos</div><div class="val" style="color:${p7?"#fb923c":"var(--text)"}">${p7}</div></div>
+    <div class="kpi"><div class="lbl">Vencen en 8 a 15 d&iacute;as</div><div class="val" style="color:${p15?"#fbbf24":"var(--text)"}">${p15}</div></div>`;
+  const txt=(document.getElementById("certFiltroTxt").value||"").toLowerCase();
+  const fe=document.getElementById("certFiltroEstado").value;
+  const ft=document.getElementById("certFiltroTienda").value;
+  const arr=all.filter(([,c])=>{
+    if(txt&&!String(c.nombre||"").toLowerCase().includes(txt))return false;
+    if(fe&&certEstado(c.vencimiento)!==fe)return false;
+    if(ft==="__general"&&c.tiendaId)return false;
+    if(ft&&ft!=="__general"&&c.tiendaId!==ft)return false;
+    return true;
+  }).sort((a,b)=>(certDias(a[1].vencimiento)??9999)-(certDias(b[1].vencimiento)??9999));
+  document.getElementById("certCount").textContent=`${arr.length} certificado(s)`;
+  if(!arr.length){
+    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted)">${all.length?"Ning\u00fan certificado coincide con el filtro":"Sin certificados. Agrega el primero."}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=arr.map(([id,c])=>{
+    const est=certEstado(c.vencimiento),d=certDias(c.vencimiento);
+    let dt,cls=est;
+    if(d===null){dt="Sin fecha";cls="nofecha";}
+    else if(d<0)dt=`Venci\u00f3 hace ${Math.abs(d)}d`;
+    else if(d===0)dt="\u26a0\ufe0f HOY";
+    else dt=`${d} d\u00edas`;
+    return`<tr>
+      <td><strong>${escCert(c.nombre)}</strong></td>
+      <td>${certFecha(c.vencimiento)}</td>
+      <td><span class="cert-dias ${cls}">${dt}</span></td>
+      <td>${escCert(c.supervisor)||"--"}</td>
+      <td>${escCert(certTiendaNombre(c))}</td>
+      <td><span class="cert-badge ${est}">${est.replace("-"," ")}</span></td>
+      <td>${puedeEditarCert(c)?`<div class="cert-acc">
+        <button class="btn btn-primary" onclick="abrirModalCert('${id}')" title="Editar">&#9998;&#65039;</button>
+        <button class="btn btn-danger" onclick="eliminarCert('${id}')" title="Eliminar">&#128465;&#65039;</button>
+      </div>`:`<span style="color:var(--muted);font-size:.66rem" title="Solo el administrador de zona puede modificarlo">Solo lectura</span>`}</td>
+    </tr>`;
+  }).join("");
+};
+
+window.abrirModalCert=function(id){
+  const c=id?certificados[id]:null;
+  if(id&&!puedeEditarCert(c))return;
+  document.getElementById("modalCertTitle").textContent=c?"\u270f\ufe0f Editar certificado":"\ud83d\udcc4 Nuevo certificado";
+  document.getElementById("certEditId").value=id||"";
+  document.getElementById("certNombre").value=c?(c.nombre||""):"";
+  document.getElementById("certVencimiento").value=c&&c.vencimiento&&c.vencimiento!=="N/A"?c.vencimiento:"";
+  document.getElementById("certSupervisor").value=c?(c.supervisor||""):"";
+  const sel=document.getElementById("certTienda");
+  if(session.role==="tienda"){
+    sel.innerHTML=`<option value="${escCert(session.tiendaId)}">${escCert(session.tiendaNombre)}</option>`;
+    sel.value=session.tiendaId;sel.disabled=true;
+  }else{
+    let opts=`<option value="">General (toda la zona)</option>`;
+    if(c&&c.tiendaId&&!tiendas[c.tiendaId])opts+=`<option value="${escCert(c.tiendaId)}">${escCert(c.tienda||"Tienda eliminada")} (eliminada)</option>`;
+    opts+=Object.entries(tiendas).map(([tid,t])=>`<option value="${tid}">${escCert(t.nombre)}</option>`).join("");
+    sel.innerHTML=opts;
+    sel.value=c&&c.tiendaId?c.tiendaId:"";sel.disabled=false;
+  }
+  document.getElementById("errorCert").style.display="none";
+  document.getElementById("modalCert").style.display="flex";
+};
+
+window.guardarCert=async function(){
+  const err=document.getElementById("errorCert");
+  const nombre=document.getElementById("certNombre").value.trim();
+  if(!nombre){err.textContent="El nombre del certificado es obligatorio.";err.style.display="block";return;}
+  let id=document.getElementById("certEditId").value;
+  if(!id)id="c"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const tiendaId=session.role==="tienda"?session.tiendaId:document.getElementById("certTienda").value;
+  const previo=certificados[id]||{};
+  if(certificados[id]&&!puedeEditarCert(previo)){err.textContent="No tienes permiso para modificar este certificado.";err.style.display="block";return;}
+  const data={
+    nombre,
+    vencimiento:document.getElementById("certVencimiento").value||"N/A",
+    supervisor:document.getElementById("certSupervisor").value.trim(),
+    tiendaId:tiendaId||"",
+    tienda:session.role==="tienda"?session.tiendaNombre:(tiendaId?(tiendas[tiendaId]?tiendas[tiendaId].nombre:(previo.tienda||"")):"General"),
+    creado:previo.creado||new Date().toISOString()
+  };
+  setSynced(false);
+  try{
+    await set(ref(db,certPath(session.zonaId)+"/"+id),data);
+    closeModal();
+  }catch(e){
+    console.error(e);
+    err.textContent="No se pudo guardar el certificado. Revisa tu conexi\u00f3n.";err.style.display="block";
+    setSynced(false,true);
+  }
+};
+
+window.eliminarCert=async function(id){
+  const c=certificados[id];
+  if(!c||!puedeEditarCert(c))return;
+  if(!confirm(`\u00bfEliminar el certificado "${c.nombre}"?`))return;
+  try{await remove(ref(db,certPath(session.zonaId)+"/"+id));}
+  catch(e){console.error(e);alert("No se pudo eliminar el certificado.");}
+};
+
+// -- TICKETS --------------------------------------------------------------
+const TICKET_CATEGORIAS=["Mantenimiento","Equipos y maquinaria","Sistemas / POS","Limpieza y qu\u00edmicos","Abastecimiento / Inventario","Certificados y documentos","Otro"];
+const TICKET_PRIORIDADES=[["baja","Baja"],["media","Media"],["alta","Alta"],["urgente","Urgente"]];
+const TICKET_ESTADOS=[["abierto","Abierto"],["en_proceso","En proceso"],["resuelto","Resuelto"],["cerrado","Cerrado"]];
+let tickets={},ticketsListener=null,ticketsPrimeraCarga=true,ticketDetId=null;
+
+function ticketPath(zid){return`zonas/${zid}/tickets`;}
+function ticketLabel(lista,v){const f=lista.find(x=>x[0]===v);return f?f[1]:v;}
+function ticketFecha(iso){
+  if(!iso)return"--";
+  const d=new Date(iso);
+  return d.toLocaleDateString("es-PE",{timeZone:PERU_TZ})+" "+d.toLocaleTimeString("es-PE",{timeZone:PERU_TZ,hour:"2-digit",minute:"2-digit"});
+}
+function ticketsVisibles(){
+  return Object.entries(tickets).filter(([,t])=>session.role!=="tienda"||t.tiendaId===session.tiendaId);
+}
+function tkMsg(texto){
+  const el=document.createElement("div");
+  el.className="tk-msg";el.textContent=texto;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),5500);
+}
+
+// --- Escucha en tiempo real (avisos dentro de la app) ---
+function iniciarTickets(){
+  detenerTickets();
+  ticketsPrimeraCarga=true;
+  ticketsListener=onValue(ref(db,ticketPath(session.zonaId)),snap=>{
+    const nuevos=snap.exists()?snap.val():{};
+    if(!ticketsPrimeraCarga&&session&&session.role==="zonaadmin"){
+      Object.entries(nuevos).forEach(([id,t])=>{if(!tickets[id]&&!t.leido)avisarNuevoTicket(t);});
+    }
+    tickets=nuevos;
+    ticketsPrimeraCarga=false;
+    actualizarBadgeTickets();
+    if(currentTab==="tickets"){pintarTickets();}
+  },()=>{});
+}
+function detenerTickets(){
+  if(ticketsListener){ticketsListener();ticketsListener=null;}
+  tickets={};ticketsPrimeraCarga=true;
+}
+function actualizarBadgeTickets(){
+  const el=document.getElementById("tkBadge");
+  if(!el)return;
+  const n=Object.values(tickets).filter(t=>!t.leido).length;
+  el.textContent=n>99?"99+":String(n);
+  el.style.display=n>0?"inline-block":"none";
+}
+function avisarNuevoTicket(t){
+  let el=document.getElementById("tkToast");
+  if(!el){
+    el=document.createElement("div");el.id="tkToast";el.className="tk-toast";
+    el.onclick=()=>{el.style.display="none";switchTab("tickets");};
+    document.body.appendChild(el);
+  }
+  el.innerHTML=`<strong>\ud83c\udfab Nuevo ticket</strong><br>${escCert(t.tiendaNombre)}: ${escCert(t.titulo)}<br><span>Toca para verlo</span>`;
+  el.style.display="block";
+  clearTimeout(el._t);el._t=setTimeout(()=>{el.style.display="none";},12000);
+  try{
+    if("Notification" in window&&Notification.permission==="granted"){
+      new Notification("Nuevo ticket - "+(t.tiendaNombre||""),{body:t.titulo||""});
+    }
+  }catch(e){}
+}
+
+// --- Pantalla principal de la pestana ---
+function renderTickets(){
+  const esT=session.role==="tienda";
+  const panelAdmin=esT?"":`
+    <div class="admin-pin-box">
+      <h3>&#128276; Avisos de nuevos tickets</h3>
+      <p style="font-size:.72rem;color:var(--muted);margin:4px 0 10px">Cuando una tienda cree un ticket ver&aacute;s un globo rojo en esta pesta&ntilde;a y un aviso en pantalla mientras la app est&eacute; abierta.</p>
+      <button class="btn btn-ghost" id="tkNotifBtn" onclick="activarAvisosNavegador()" style="display:none">&#128276; Activar avisos del navegador</button>
+    </div>`;
+  document.getElementById("mainContent").innerHTML=`
+    ${panelAdmin}
+    <div class="actions">
+      <div class="section-title" style="margin:0" id="tkCount"></div>
+      ${esT?`<button class="btn btn-primary" onclick="abrirModalTicket()">&#10133; Nuevo ticket</button>`:""}
+    </div>
+    <div class="cert-filter">
+      <input type="text" id="tkFiltroTxt" placeholder="&#128269; Buscar ticket..." oninput="pintarTickets()">
+      <select id="tkFiltroEstado" onchange="pintarTickets()">
+        <option value="">Todos los estados</option>
+        ${TICKET_ESTADOS.map(e=>`<option value="${e[0]}">${e[1]}</option>`).join("")}
+      </select>
+      <select id="tkFiltroPrior" onchange="pintarTickets()">
+        <option value="">Toda prioridad</option>
+        ${TICKET_PRIORIDADES.map(e=>`<option value="${e[0]}">${e[1]}</option>`).join("")}
+      </select>
+      ${esT?"":`<select id="tkFiltroTienda" onchange="pintarTickets()">
+        <option value="">Todas las tiendas</option>
+        ${Object.entries(tiendas).map(([id,t])=>`<option value="${id}">${escCert(t.nombre)}</option>`).join("")}
+      </select>`}
+    </div>
+    <div class="table-wrap"><table class="cert-table"><thead><tr>
+      <th>C&oacute;digo</th><th>Fecha</th>${esT?"":"<th>Tienda</th>"}<th>Categor&iacute;a</th><th>T&iacute;tulo</th><th>Prioridad</th><th>Estado</th><th></th>
+    </tr></thead><tbody id="tkTbody"></tbody></table></div>`;
+  if(!esT){
+    const b=document.getElementById("tkNotifBtn");
+    if(b&&"Notification" in window&&Notification.permission==="default")b.style.display="";
+  }
+  pintarTickets();
+}
+
+window.pintarTickets=function(){
+  const tbody=document.getElementById("tkTbody");
+  if(!tbody)return;
+  const esT=session.role==="tienda";
+  const all=ticketsVisibles();
+  const cnt=e=>all.filter(([,t])=>t.estado===e).length;
+  const sinLeer=all.filter(([,t])=>!t.leido).length;
+  document.getElementById("kpiStrip").innerHTML=`
+    <div class="kpi"><div class="lbl">Total tickets</div><div class="val">${all.length}</div></div>
+    ${esT?"":`<div class="kpi"><div class="lbl">Sin leer</div><div class="val" style="color:${sinLeer?"#f87171":"var(--text)"}">${sinLeer}</div></div>`}
+    <div class="kpi"><div class="lbl">Abiertos</div><div class="val" style="color:${cnt("abierto")?"#60a5fa":"var(--text)"}">${cnt("abierto")}</div></div>
+    <div class="kpi"><div class="lbl">En proceso</div><div class="val" style="color:${cnt("en_proceso")?"#fbbf24":"var(--text)"}">${cnt("en_proceso")}</div></div>
+    <div class="kpi"><div class="lbl">Resueltos / cerrados</div><div class="val">${cnt("resuelto")+cnt("cerrado")}</div></div>`;
+  const txt=(document.getElementById("tkFiltroTxt").value||"").toLowerCase();
+  const fe=document.getElementById("tkFiltroEstado").value;
+  const fp=document.getElementById("tkFiltroPrior").value;
+  const ftEl=document.getElementById("tkFiltroTienda");
+  const ft=ftEl?ftEl.value:"";
+  const arr=all.filter(([,t])=>{
+    if(txt&&!((t.titulo||"")+" "+(t.descripcion||"")+" "+(t.codigo||"")).toLowerCase().includes(txt))return false;
+    if(fe&&t.estado!==fe)return false;
+    if(fp&&t.prioridad!==fp)return false;
+    if(ft&&t.tiendaId!==ft)return false;
+    return true;
+  }).sort((a,b)=>String(b[1].creado||"").localeCompare(String(a[1].creado||"")));
+  document.getElementById("tkCount").textContent=`${arr.length} ticket(s)`;
+  const cols=esT?7:8;
+  if(!arr.length){
+    tbody.innerHTML=`<tr><td colspan="${cols}" style="text-align:center;padding:30px;color:var(--muted)">${all.length?"Ning\u00fan ticket coincide con el filtro":(esT?"A\u00fan no has creado tickets.":"Sin tickets por ahora.")}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=arr.map(([id,t])=>{
+    const unread=!esT&&!t.leido;
+    return`<tr class="${unread?"tk-unread":""}">
+      <td><span class="tk-code">${unread?`<span class="tk-dot"></span>`:""}${escCert(t.codigo)}</span></td>
+      <td style="white-space:nowrap">${ticketFecha(t.creado)}</td>
+      ${esT?"":`<td>${escCert(t.tiendaNombre)}</td>`}
+      <td>${escCert(t.categoria)}</td>
+      <td>${escCert(t.titulo)}</td>
+      <td><span class="cert-badge tkp-${escCert(t.prioridad)}">${escCert(ticketLabel(TICKET_PRIORIDADES,t.prioridad))}</span></td>
+      <td><span class="cert-badge tk-${escCert(t.estado)}">${escCert(ticketLabel(TICKET_ESTADOS,t.estado))}</span></td>
+      <td><button class="btn btn-ghost" style="padding:4px 12px;min-height:30px" onclick="abrirTicketDet('${id}')">Ver</button></td>
+    </tr>`;
+  }).join("");
+};
+
+// --- Crear ticket (tienda) ---
+window.abrirModalTicket=function(){
+  if(session.role!=="tienda")return;
+  document.getElementById("tkCategoria").innerHTML=TICKET_CATEGORIAS.map(c=>`<option value="${escCert(c)}">${escCert(c)}</option>`).join("");
+  document.getElementById("tkPrioridad").innerHTML=TICKET_PRIORIDADES.map(p=>`<option value="${p[0]}">${p[1]}</option>`).join("");
+  document.getElementById("tkPrioridad").value="media";
+  document.getElementById("tkTitulo").value="";
+  document.getElementById("tkDescripcion").value="";
+  document.getElementById("errorTicket").style.display="none";
+  document.getElementById("btnGuardarTicket").disabled=false;
+  document.getElementById("modalTicket").style.display="flex";
+};
+
+window.guardarTicket=async function(){
+  if(session.role!=="tienda")return;
+  const err=document.getElementById("errorTicket");
+  const titulo=document.getElementById("tkTitulo").value.trim();
+  const descripcion=document.getElementById("tkDescripcion").value.trim();
+  if(!titulo||!descripcion){err.textContent="Escribe el t\u00edtulo y la descripci\u00f3n del ticket.";err.style.display="block";return;}
+  const btn=document.getElementById("btnGuardarTicket");
+  btn.disabled=true;
+  const ahora=Date.now();
+  const id="k"+ahora.toString(36)+Math.random().toString(36).slice(2,6);
+  const iso=new Date(ahora).toISOString();
+  const data={
+    codigo:"TK-"+ahora.toString(36).slice(-5).toUpperCase(),
+    titulo,descripcion,
+    categoria:document.getElementById("tkCategoria").value,
+    prioridad:document.getElementById("tkPrioridad").value,
+    estado:"abierto",
+    tiendaId:session.tiendaId,tiendaNombre:session.tiendaNombre,
+    creado:iso,actualizado:iso,leido:false,respuesta:""
+  };
+  setSynced(false);
+  try{
+    await set(ref(db,ticketPath(session.zonaId)+"/"+id),data);
+  }catch(e){
+    console.error(e);
+    err.textContent="No se pudo crear el ticket. Revisa tu conexi\u00f3n.";err.style.display="block";
+    btn.disabled=false;setSynced(false,true);return;
+  }
+  closeModal();
+  tkMsg("\u2705 Ticket creado. Tu supervisor fue notificado.");
+};
+
+// --- Detalle (tienda: solo lectura / supervisor: gestion) ---
+window.abrirTicketDet=function(id){
+  const t=tickets[id];
+  if(!t)return;
+  if(session.role==="tienda"&&t.tiendaId!==session.tiendaId)return;
+  ticketDetId=id;
+  const esT=session.role==="tienda";
+  if(!esT&&!t.leido){
+    update(ref(db,ticketPath(session.zonaId)+"/"+id),{leido:true}).catch(()=>{});
+  }
+  const desc=escCert(t.descripcion).replace(/\n/g,"<br>");
+  let bloque;
+  if(esT){
+    bloque=t.respuesta
+      ?`<div class="tk-resp"><label>Respuesta del supervisor</label>${escCert(t.respuesta).replace(/\n/g,"<br>")}</div>`
+      :`<p style="font-size:.76rem;color:var(--muted)">A\u00fan no hay respuesta del supervisor.</p>`;
+  }else{
+    bloque=`
+      <div class="form-group"><label>Estado</label>
+        <select id="tkDetEstado">${TICKET_ESTADOS.map(e=>`<option value="${e[0]}"${e[0]===t.estado?" selected":""}>${e[1]}</option>`).join("")}</select></div>
+      <div class="form-group"><label>Respuesta / comentario para la tienda</label>
+        <textarea id="tkDetResp" rows="3" maxlength="800" placeholder="Escribe una respuesta o indicaci\u00f3n...">${escCert(t.respuesta||"")}</textarea></div>`;
+  }
+  document.getElementById("ticketDetBody").innerHTML=`
+    <h2>&#127915; <span class="tk-code">${escCert(t.codigo)}</span> &middot; ${escCert(t.titulo)}</h2>
+    <div class="tk-meta">
+      Tienda: <b>${escCert(t.tiendaNombre)}</b> &middot; Categor&iacute;a: <b>${escCert(t.categoria)}</b><br>
+      Prioridad: <span class="cert-badge tkp-${escCert(t.prioridad)}">${escCert(ticketLabel(TICKET_PRIORIDADES,t.prioridad))}</span>
+      &nbsp;Estado: <span class="cert-badge tk-${escCert(t.estado)}">${escCert(ticketLabel(TICKET_ESTADOS,t.estado))}</span><br>
+      Creado: ${ticketFecha(t.creado)}${t.actualizado&&t.actualizado!==t.creado?` &middot; Actualizado: ${ticketFecha(t.actualizado)}`:""}
+    </div>
+    <div class="tk-desc">${desc}</div>
+    ${bloque}
+    <div class="modal-error" id="errorTicketDet"></div>
+    <div class="modal-actions">
+      ${esT?"":`<button class="btn btn-danger" style="margin-right:auto" onclick="eliminarTicket()">Eliminar</button>`}
+      <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
+      ${esT?"":`<button class="btn btn-primary" onclick="guardarTicketDet()">Guardar</button>`}
+    </div>`;
+  document.getElementById("modalTicketDet").style.display="flex";
+};
+
+window.guardarTicketDet=async function(){
+  if(session.role!=="zonaadmin"||!ticketDetId||!tickets[ticketDetId])return;
+  const err=document.getElementById("errorTicketDet");
+  try{
+    await update(ref(db,ticketPath(session.zonaId)+"/"+ticketDetId),{
+      estado:document.getElementById("tkDetEstado").value,
+      respuesta:document.getElementById("tkDetResp").value.trim(),
+      actualizado:new Date().toISOString(),
+      leido:true
+    });
+    closeModal();
+  }catch(e){
+    console.error(e);
+    err.textContent="No se pudo guardar. Revisa tu conexi\u00f3n.";err.style.display="block";
+  }
+};
+
+window.eliminarTicket=async function(){
+  if(session.role!=="zonaadmin"||!ticketDetId||!tickets[ticketDetId])return;
+  if(!confirm(`\u00bfEliminar el ticket ${tickets[ticketDetId].codigo}? Esta acci\u00f3n no se puede deshacer.`))return;
+  try{
+    await remove(ref(db,ticketPath(session.zonaId)+"/"+ticketDetId));
+    closeModal();
+  }catch(e){console.error(e);alert("No se pudo eliminar el ticket.");}
+};
+
+// --- Avisos del navegador (supervisor) ---
+window.activarAvisosNavegador=async function(){
+  try{
+    const p=await Notification.requestPermission();
+    const b=document.getElementById("tkNotifBtn");
+    if(b&&p!=="default")b.style.display="none";
+    if(p==="granted")tkMsg("\uD83D\uDD14 Avisos del navegador activados.");
+  }catch(e){}
+};
+
+
 init();
 </script>
 </body>
