@@ -271,6 +271,10 @@ tr.tk-unread td{font-weight:700;background:rgba(59,130,246,.06);}
 #modalTicketDet .form-group select:focus,#modalTicketDet .form-group textarea:focus{border-color:var(--accent);}
 #modalTicket textarea,#modalTicketDet textarea{resize:vertical;}
 #modalTicketDet .modal{max-height:90vh;overflow-y:auto;}
+
+/* CARNET DE SANIDAD */
+#modalCarnet .form-group input,#modalCarnet .form-group select{letter-spacing:normal;font-weight:500;width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:7px;font-size:16px;outline:none;}
+#modalCarnet .form-group input:focus,#modalCarnet .form-group select:focus{border-color:var(--accent);}
 </style>
 </head>
 <body>
@@ -440,6 +444,23 @@ tr.tk-unread td{font-weight:700;background:rgba(59,130,246,.06);}
   <div class="modal" style="max-width:520px;" id="ticketDetBody"></div>
 </div>
 
+<div class="modal-overlay" id="modalCarnet" style="display:none;">
+  <div class="modal">
+    <h2 id="modalCarnetTitle">&#129658; Nuevo carnet de sanidad</h2>
+    <input type="hidden" id="csEditId">
+    <div class="form-group"><label>Nombre *</label><input type="text" id="csNombre" maxlength="50" placeholder="Nombre del colaborador"></div>
+    <div class="form-group"><label>Apellido *</label><input type="text" id="csApellido" maxlength="50" placeholder="Apellido del colaborador"></div>
+    <div class="form-group"><label>Cargo *</label><input type="text" id="csCargo" maxlength="50" placeholder="Ej: Cocinero, Cajero, Repartidor"></div>
+    <div class="form-group"><label>Fecha de vencimiento *</label><input type="date" id="csVenc"></div>
+    <div class="form-group" id="csTiendaGrp"><label>Tienda *</label><select id="csTienda"></select></div>
+    <div class="modal-error" id="errorCarnet"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarCarnet()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, get, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -597,7 +618,7 @@ async function buscarTiendaEnZonas(pin){
 }
 
 window.doLogout=function(){
-  detenerTickets();session=null;localData={};tiendas={};certificados={};currentTab="resumen";
+  detenerTickets();session=null;localData={};tiendas={};certificados={};carnets={};currentTab="resumen";
   if(dbListener){dbListener();dbListener=null;}
   document.getElementById("appScreen").style.display="none";
   document.getElementById("loginScreen").style.display="flex";
@@ -785,6 +806,7 @@ function renderZonaAdminTabs(){
     {id:"objetivos",label:"🎯 Objetivos CV"},
     {id:"certificados",label:"📄 Certificados"},
     {id:"tickets",label:"\ud83c\udfab Tickets <span class=\"tk-badge\" id=\"tkBadge\" style=\"display:none\"></span>"},
+    {id:"carnets",label:"\ud83e\ude7a Carnet de sanidad"},
   ];
   document.getElementById("appTabs").innerHTML=tabs.map(t=>`<div class="tab" id="tab-${t.id}" onclick="switchTab('${t.id}')">${t.label}</div>`).join("");
   actualizarBadgeTickets();
@@ -795,6 +817,7 @@ function renderTiendaTabs(){
     {id:"tdatos",label:"\ud83d\udcdd Ingreso de datos"},
     {id:"certificados",label:"\ud83d\udcc4 Certificados"},
     {id:"tickets",label:"\ud83c\udfab Tickets"},
+    {id:"carnets",label:"\ud83e\ude7a Carnet de sanidad"},
   ];
   document.getElementById("appTabs").innerHTML=tabs.map(t=>`<div class="tab" id="tab-${t.id}" onclick="switchTab('${t.id}')">${t.label}</div>`).join("");
 }
@@ -813,6 +836,7 @@ window.switchTab=function(tab){
     document.getElementById("monthSel").style.display=vis;
     if(tab==="certificados")renderCertificados();
     else if(tab==="tickets")renderTickets();
+    else if(tab==="carnets")renderCarnets();
     else suscribirDatosTienda(session.zonaId,session.tiendaId);
     return;
   }
@@ -821,6 +845,7 @@ window.switchTab=function(tab){
   else if(tab==="objetivos")renderPanelObjetivos();
   else if(tab==="certificados")renderCertificados();
   else if(tab==="tickets")renderTickets();
+  else if(tab==="carnets")renderCarnets();
   else renderVerTienda();
 };
 
@@ -1639,7 +1664,7 @@ window.procesarImportJSON=async function(input){
 
 // ══ CLOSE MODAL ═══════════════════════════════════════════════════════════════
 window.closeModal=function(){
-  ["modalZona","modalTienda","modalEliminar","modalCambiarPin","modalMeta","modalObjetivos","modalCert","modalTicket","modalTicketDet"].forEach(id=>{
+  ["modalZona","modalTienda","modalEliminar","modalCambiarPin","modalMeta","modalObjetivos","modalCert","modalTicket","modalTicketDet","modalCarnet"].forEach(id=>{
     const el=document.getElementById(id);if(el)el.style.display="none";
   });
 };
@@ -2076,6 +2101,167 @@ window.activarAvisosNavegador=async function(){
     if(b&&p!=="default")b.style.display="none";
     if(p==="granted")tkMsg("\uD83D\uDD14 Avisos del navegador activados.");
   }catch(e){}
+};
+
+
+// -- CARNET DE SANIDAD -----------------------------------------------------
+let carnets={};
+function carnetPath(zid){return`zonas/${zid}/carnets`;}
+function puedeEditarCarnet(c){
+  if(!session)return false;
+  if(session.role==="zonaadmin")return true;
+  if(session.role==="tienda")return !!c&&!!c.tiendaId&&c.tiendaId===session.tiendaId;
+  return false;
+}
+function carnetTiendaNombre(c){return(c.tiendaId&&tiendas[c.tiendaId]?tiendas[c.tiendaId].nombre:c.tienda)||"--";}
+const CARNET_ALERTA={"vencido":"Vencido","proximo-7":"Por vencer (7 d\u00edas)","proximo-15":"Por vencer (15 d\u00edas)","vigente":"Vigente"};
+
+function renderCarnets(){
+  const esT=session.role==="tienda";
+  document.getElementById("mainContent").innerHTML=`
+    <div class="actions">
+      <div class="section-title" style="margin:0" id="csCount"></div>
+      <button class="btn btn-primary" onclick="abrirModalCarnet()">&#10133; Nuevo carnet</button>
+    </div>
+    <div class="cert-filter">
+      <input type="text" id="csFiltroTxt" placeholder="&#128269; Buscar por nombre, apellido o cargo..." oninput="pintarCarnets()">
+      <select id="csFiltroEstado" onchange="pintarCarnets()">
+        <option value="">Todas las alertas</option>
+        <option value="vencido">Vencido</option>
+        <option value="proximo-7">Por vencer (7 d&iacute;as)</option>
+        <option value="proximo-15">Por vencer (15 d&iacute;as)</option>
+        <option value="vigente">Vigente</option>
+      </select>
+      ${esT?"":`<select id="csFiltroTienda" onchange="pintarCarnets()">
+        <option value="">Todas las tiendas</option>
+        ${Object.entries(tiendas).map(([id,t])=>`<option value="${id}">${escCert(t.nombre)}</option>`).join("")}
+      </select>`}
+    </div>
+    <div class="table-wrap"><table class="cert-table"><thead><tr>
+      <th>Nombre</th><th>Apellido</th><th>Cargo</th>${esT?"":"<th>Tienda</th>"}<th>Vencimiento</th><th>Alerta</th><th>Acciones</th>
+    </tr></thead><tbody id="csTbody"></tbody></table></div>`;
+  dbListener=onValue(ref(db,carnetPath(session.zonaId)),snap=>{
+    carnets=snap.exists()?snap.val():{};
+    pintarCarnets();
+    setSynced(true);
+  },()=>setSynced(false,true));
+}
+
+window.pintarCarnets=function(){
+  const tbody=document.getElementById("csTbody");
+  if(!tbody)return;
+  const esT=session.role==="tienda";
+  const all=Object.entries(carnets).filter(([,c])=>!esT||c.tiendaId===session.tiendaId);
+  const venc=all.filter(([,c])=>certEstado(c.vencimiento)==="vencido").length;
+  const p7=all.filter(([,c])=>{const d=certDias(c.vencimiento);return d!==null&&d>=0&&d<=7;}).length;
+  const p15=all.filter(([,c])=>{const d=certDias(c.vencimiento);return d!==null&&d>7&&d<=15;}).length;
+  document.getElementById("kpiStrip").innerHTML=`
+    <div class="kpi"><div class="lbl">Total carnets</div><div class="val">${all.length}</div></div>
+    <div class="kpi"><div class="lbl">Vencidos</div><div class="val" style="color:${venc?"#f87171":"var(--text)"}">${venc}</div></div>
+    <div class="kpi"><div class="lbl">Vencen en 7 d&iacute;as o menos</div><div class="val" style="color:${p7?"#fb923c":"var(--text)"}">${p7}</div></div>
+    <div class="kpi"><div class="lbl">Vencen en 8 a 15 d&iacute;as</div><div class="val" style="color:${p15?"#fbbf24":"var(--text)"}">${p15}</div></div>`;
+  const txt=(document.getElementById("csFiltroTxt").value||"").toLowerCase();
+  const fe=document.getElementById("csFiltroEstado").value;
+  const ftEl=document.getElementById("csFiltroTienda");
+  const ft=ftEl?ftEl.value:"";
+  const arr=all.filter(([,c])=>{
+    if(txt&&!((c.nombre||"")+" "+(c.apellido||"")+" "+(c.cargo||"")).toLowerCase().includes(txt))return false;
+    if(fe&&certEstado(c.vencimiento)!==fe)return false;
+    if(ft&&c.tiendaId!==ft)return false;
+    return true;
+  }).sort((a,b)=>(certDias(a[1].vencimiento)??9999)-(certDias(b[1].vencimiento)??9999));
+  document.getElementById("csCount").textContent=`${arr.length} carnet(s)`;
+  const cols=esT?6:7;
+  if(!arr.length){
+    tbody.innerHTML=`<tr><td colspan="${cols}" style="text-align:center;padding:30px;color:var(--muted)">${all.length?"Ning\u00fan carnet coincide con el filtro":"Sin carnets registrados. Agrega el primero."}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=arr.map(([id,c])=>{
+    const est=certEstado(c.vencimiento),d=certDias(c.vencimiento);
+    let dt;
+    if(d===null)dt="Sin fecha";
+    else if(d<0)dt=`Venci\u00f3 hace ${Math.abs(d)}d`;
+    else if(d===0)dt="\u26a0\ufe0f HOY";
+    else dt=`${d} d\u00edas`;
+    return`<tr>
+      <td><strong>${escCert(c.nombre)}</strong></td>
+      <td><strong>${escCert(c.apellido)}</strong></td>
+      <td>${escCert(c.cargo)}</td>
+      ${esT?"":`<td>${escCert(carnetTiendaNombre(c))}</td>`}
+      <td>${certFecha(c.vencimiento)}</td>
+      <td><span class="cert-badge ${est}">${CARNET_ALERTA[est]}</span> <span class="cert-dias ${est}">${dt}</span></td>
+      <td>${puedeEditarCarnet(c)?`<div class="cert-acc">
+        <button class="btn btn-primary" onclick="abrirModalCarnet('${id}')" title="Editar">&#9998;&#65039;</button>
+        <button class="btn btn-danger" onclick="eliminarCarnet('${id}')" title="Eliminar">&#128465;&#65039;</button>
+      </div>`:`<span style="color:var(--muted);font-size:.66rem">Solo lectura</span>`}</td>
+    </tr>`;
+  }).join("");
+};
+
+window.abrirModalCarnet=function(id){
+  const c=id?carnets[id]:null;
+  if(id&&!puedeEditarCarnet(c))return;
+  document.getElementById("modalCarnetTitle").textContent=c?"\u270f\ufe0f Editar carnet de sanidad":"\ud83e\ude7a Nuevo carnet de sanidad";
+  document.getElementById("csEditId").value=id||"";
+  document.getElementById("csNombre").value=c?(c.nombre||""):"";
+  document.getElementById("csApellido").value=c?(c.apellido||""):"";
+  document.getElementById("csCargo").value=c?(c.cargo||""):"";
+  document.getElementById("csVenc").value=c&&c.vencimiento?c.vencimiento:"";
+  const sel=document.getElementById("csTienda");
+  const grp=document.getElementById("csTiendaGrp");
+  if(session.role==="tienda"){
+    grp.style.display="none";
+    sel.innerHTML=`<option value="${escCert(session.tiendaId)}">${escCert(session.tiendaNombre)}</option>`;
+    sel.value=session.tiendaId;
+  }else{
+    grp.style.display="";
+    let opts=`<option value="">\u2014 Selecciona la tienda \u2014</option>`;
+    if(c&&c.tiendaId&&!tiendas[c.tiendaId])opts+=`<option value="${escCert(c.tiendaId)}">${escCert(c.tienda||"Tienda eliminada")} (eliminada)</option>`;
+    opts+=Object.entries(tiendas).map(([tid,t])=>`<option value="${tid}">${escCert(t.nombre)}</option>`).join("");
+    sel.innerHTML=opts;
+    sel.value=c&&c.tiendaId?c.tiendaId:"";
+  }
+  document.getElementById("errorCarnet").style.display="none";
+  document.getElementById("modalCarnet").style.display="flex";
+};
+
+window.guardarCarnet=async function(){
+  const err=document.getElementById("errorCarnet");
+  const mostrar=m=>{err.textContent=m;err.style.display="block";};
+  const nombre=document.getElementById("csNombre").value.trim();
+  const apellido=document.getElementById("csApellido").value.trim();
+  const cargo=document.getElementById("csCargo").value.trim();
+  const venc=document.getElementById("csVenc").value;
+  const tiendaId=session.role==="tienda"?session.tiendaId:document.getElementById("csTienda").value;
+  if(!nombre||!apellido||!cargo){mostrar("Completa nombre, apellido y cargo.");return;}
+  if(!venc){mostrar("Indica la fecha de vencimiento del carnet.");return;}
+  if(!tiendaId){mostrar("Selecciona la tienda del colaborador.");return;}
+  let id=document.getElementById("csEditId").value;
+  const previo=id?(carnets[id]||{}):{};
+  if(id&&!puedeEditarCarnet(previo)){mostrar("No tienes permiso para modificar este carnet.");return;}
+  if(!id)id="s"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const data={
+    nombre,apellido,cargo,vencimiento:venc,
+    tiendaId,
+    tienda:session.role==="tienda"?session.tiendaNombre:(tiendas[tiendaId]?tiendas[tiendaId].nombre:(previo.tienda||"")),
+    creado:previo.creado||new Date().toISOString()
+  };
+  setSynced(false);
+  try{
+    await set(ref(db,carnetPath(session.zonaId)+"/"+id),data);
+    closeModal();
+  }catch(e){
+    console.error(e);
+    mostrar("No se pudo guardar el carnet. Revisa tu conexi\u00f3n.");setSynced(false,true);
+  }
+};
+
+window.eliminarCarnet=async function(id){
+  const c=carnets[id];
+  if(!c||!puedeEditarCarnet(c))return;
+  if(!confirm(`\u00bfEliminar el carnet de ${c.nombre} ${c.apellido}?`))return;
+  try{await remove(ref(db,carnetPath(session.zonaId)+"/"+id));}
+  catch(e){console.error(e);alert("No se pudo eliminar el carnet.");}
 };
 
 
