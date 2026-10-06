@@ -382,8 +382,8 @@ tr.tk-unread td{font-weight:700;background:rgba(59,130,246,.06);}
   <div class="modal">
     <h2>🎯 Meta de ventas del mes</h2>
     <input type="hidden" id="metaTiendaId">
-    <div class="form-group"><label>Meta mensual (S/)</label><input type="number" step="0.01" id="metaMensualInput" placeholder="Ej: 250000"></div>
-    <div class="form-group"><label>Meta diaria (S/) — opcional</label><input type="number" step="0.01" id="metaDiariaInput" placeholder="Se calcula automático si lo dejas vacío"></div>
+    <div class="form-group"><label>Meta mensual (<span class="monSim">S/</span>)</label><input type="number" step="0.01" id="metaMensualInput" placeholder="Ej: 250000"></div>
+    <div class="form-group"><label>Meta diaria (<span class="monSim">S/</span>) — opcional</label><input type="number" step="0.01" id="metaDiariaInput" placeholder="Se calcula automático si lo dejas vacío"></div>
     <p style="font-size:.7rem;color:var(--muted);margin-top:-6px;">Si no defines una meta diaria, se divide la meta mensual entre los días del mes.</p>
     <div class="modal-actions" style="justify-content:space-between;">
       <button class="btn btn-danger" onclick="eliminarMeta()">🗑 Eliminar</button>
@@ -519,6 +519,94 @@ let filtroHasta=null; // día fin del filtro
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const parseF=v=>{if(v===""||v===null||v===undefined)return null;const n=parseFloat(v);return isNaN(n)?null:n;};
+// -- MONEDA (zona = consolidado; cada tienda puede tener la suya) ------------
+const MONEDAS={PEN:{simbolo:"S/",nombre:"Soles (S/)"},USD:{simbolo:"US$",nombre:"D\u00f3lares (US$)"}};
+let moneda="PEN";          // moneda de la zona (se usa en el consolidado)
+let monedaActiva="PEN";    // moneda de la vista actual (zona o tienda)
+let tipoCambio=0;          // soles por 1 d\u00f3lar (para convertir en el consolidado)
+function sim(){return(MONEDAS[monedaActiva]||MONEDAS.PEN).simbolo;}
+function aplicarMonedaDOM(){document.querySelectorAll(".monSim").forEach(e=>{e.textContent=sim();});}
+function monedaDeTienda(tid){
+  if(session&&session.role==="tienda")return session.tiendaMoneda||moneda;
+  const m=tiendas[tid]&&tiendas[tid].moneda;
+  return MONEDAS[m]?m:moneda;
+}
+async function cargarMoneda(){
+  moneda="PEN";tipoCambio=0;
+  try{
+    const z=session.zonaId;
+    const snap=await get(ref(db,`zonas/${z}/moneda`));
+    moneda=snap.exists()&&MONEDAS[snap.val()]?snap.val():"PEN";
+    const tc=await get(ref(db,`zonas/${z}/tipoCambio`));
+    tipoCambio=tc.exists()?(parseFloat(tc.val())||0):0;
+    if(session.role==="tienda"){
+      const sm=await get(ref(db,`zonas/${z}/tiendas/${session.tiendaId}/moneda`));
+      session.tiendaMoneda=sm.exists()&&MONEDAS[sm.val()]?sm.val():"";
+    }
+  }catch(e){console.error(e);}
+  monedaActiva=session.role==="tienda"?(session.tiendaMoneda||moneda):moneda;
+  aplicarMonedaDOM();
+}
+window.guardarMoneda=async function(){
+  if(!session||session.role!=="zonaadmin")return;
+  const v=document.getElementById("monedaSel").value;
+  const msg=document.getElementById("monedaMsg");
+  if(!MONEDAS[v])return;
+  try{
+    await set(ref(db,`zonas/${session.zonaId}/moneda`),v);
+    moneda=v;monedaActiva=v;aplicarMonedaDOM();
+    msg.style.color="#22c55e";msg.textContent="\u2705 Moneda de la zona: "+MONEDAS[v].nombre;
+    renderGestionTiendas();
+  }catch(e){
+    console.error(e);msg.style.color="#f87171";msg.textContent="No se pudo guardar. Revisa tu conexi\u00f3n.";
+  }
+};
+window.guardarTipoCambio=async function(){
+  if(!session||session.role!=="zonaadmin")return;
+  const msg=document.getElementById("monedaMsg");
+  const v=parseFloat(String(document.getElementById("tcInput").value).replace(",","."));
+  if(!(v>0)){msg.style.color="#f87171";msg.textContent="Escribe un tipo de cambio mayor que 0.";return;}
+  try{
+    await set(ref(db,`zonas/${session.zonaId}/tipoCambio`),v);
+    tipoCambio=v;
+    msg.style.color="#22c55e";msg.textContent="\u2705 Tipo de cambio guardado: 1 US$ = S/ "+v;
+  }catch(e){
+    console.error(e);msg.style.color="#f87171";msg.textContent="No se pudo guardar el tipo de cambio.";
+  }
+};
+window.guardarMonedaTiendaAdmin=async function(id,v){
+  if(!session||session.role!=="zonaadmin"||!tiendas[id])return;
+  const path=`zonas/${session.zonaId}/tiendas/${id}/moneda`;
+  try{
+    if(MONEDAS[v]){await set(ref(db,path),v);tiendas[id].moneda=v;}
+    else{await remove(ref(db,path));delete tiendas[id].moneda;}
+  }catch(e){console.error(e);alert("No se pudo guardar la moneda de la tienda.");renderGestionTiendas();}
+};
+function crearSelectorMonedaTienda(){
+  let sel=document.getElementById("monedaTiendaSel");
+  if(!sel){
+    sel=document.createElement("select");
+    sel.id="monedaTiendaSel";sel.style.minWidth="110px";sel.title="Moneda de tu tienda";
+    sel.onchange=()=>guardarMonedaTienda(sel.value);
+    const ms=document.getElementById("monthSel");
+    ms.parentNode.insertBefore(sel,ms.nextSibling);
+  }
+  sel.innerHTML=Object.entries(MONEDAS).map(([k,m])=>`<option value="${k}">${m.nombre}</option>`).join("");
+  sel.value=monedaActiva;
+  sel.style.display="";
+}
+window.guardarMonedaTienda=async function(v){
+  if(!session||session.role!=="tienda"||!MONEDAS[v])return;
+  try{
+    await set(ref(db,`zonas/${session.zonaId}/tiendas/${session.tiendaId}/moneda`),v);
+    session.tiendaMoneda=v;monedaActiva=v;aplicarMonedaDOM();
+    if(currentTab==="tdatos")suscribirDatosTienda(session.zonaId,session.tiendaId);
+  }catch(e){
+    console.error(e);alert("No se pudo guardar la moneda.");
+    const sel=document.getElementById("monedaTiendaSel");if(sel)sel.value=monedaActiva;
+  }
+};
+
 const fmt=v=>v===null||v===""?"":parseFloat(v).toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtPct=v=>v===null||v===undefined?"":( v*100).toFixed(2)+"%";
 const fmtPctV=v=>v===null||v===undefined?"—":(v*100).toFixed(2)+"%";
@@ -618,7 +706,7 @@ async function buscarTiendaEnZonas(pin){
 }
 
 window.doLogout=function(){
-  detenerTickets();session=null;localData={};tiendas={};certificados={};carnets={};currentTab="resumen";
+  moneda="PEN";monedaActiva="PEN";tipoCambio=0;{const x=document.getElementById("monedaTiendaSel");if(x)x.remove();}aplicarMonedaDOM();detenerTickets();session=null;localData={};tiendas={};certificados={};carnets={};currentTab="resumen";
   if(dbListener){dbListener();dbListener=null;}
   document.getElementById("appScreen").style.display="none";
   document.getElementById("loginScreen").style.display="flex";
@@ -630,6 +718,7 @@ async function startApp(){
   document.getElementById("loginScreen").style.display="none";
   document.getElementById("appScreen").style.display="block";
   poblarSelectoresFecha();
+  if(session.role!=="superadmin")await cargarMoneda();
 
   if(session.role==="superadmin"){
     document.getElementById("headerTitle").textContent="Super Admin";
@@ -658,6 +747,7 @@ async function startApp(){
     document.getElementById("monthSel").style.display="";
     document.getElementById("appTabs").style.display="flex";
     renderTiendaTabs();
+    crearSelectorMonedaTienda();
     iniciarTickets();
     switchTab("tdatos");
   }
@@ -834,6 +924,7 @@ window.switchTab=function(tab){
     const vis=tab==="tdatos"?"":"none";
     document.getElementById("yearSel").style.display=vis;
     document.getElementById("monthSel").style.display=vis;
+    const msel=document.getElementById("monedaTiendaSel");if(msel)msel.style.display=vis;
     if(tab==="certificados")renderCertificados();
     else if(tab==="tickets")renderTickets();
     else if(tab==="carnets")renderCarnets();
@@ -856,6 +947,22 @@ async function renderResumen(){
   if(!ids.length){document.getElementById("mainContent").innerHTML=`<p style="padding:20px;color:var(--muted)">No hay tiendas registradas.</p>`;return;}
   const snaps=await Promise.all(ids.map(id=>get(ref(db,cvPath(session.zonaId,id,currentYM)))));
   const allData={};ids.forEach((id,i)=>{allData[id]=snaps[i].exists()?snaps[i].val():emptyData(currentYM);});
+  monedaActiva=moneda;aplicarMonedaDOM();
+  // Tiendas con otra moneda: se convierten a la moneda de la zona
+  const otras=ids.filter(id=>monedaDeTienda(id)!==moneda);
+  let avisoMoneda="";
+  if(otras.length){
+    const nombres=otras.map(id=>(tiendas[id]&&tiendas[id].nombre)||id).join(", ");
+    if(tipoCambio>0){
+      otras.forEach(id=>{
+        const f=monedaDeTienda(id)==="USD"?tipoCambio:1/tipoCambio;
+        INDICATORS.forEach(ind=>{allData[id][ind.key]=(allData[id][ind.key]||[]).map(v=>{const x=parseF(v);return x===null?v:String(Math.round(x*f*10000)/10000);});});
+      });
+      avisoMoneda=`<div style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.35);color:#93c5fd;border-radius:9px;padding:9px 14px;font-size:.74rem;margin-bottom:12px;">&#128178; Montos convertidos a ${MONEDAS[moneda].nombre} (1 US$ = S/ ${tipoCambio}) para: <b>${nombres}</b>.</div>`;
+    }else{
+      avisoMoneda=`<div style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);color:#fbbf24;border-radius:9px;padding:9px 14px;font-size:.74rem;margin-bottom:12px;">&#9888;&#65039; Estas tiendas usan otra moneda: <b>${nombres}</b>. Sin tipo de cambio los totales consolidados mezclan monedas. Def&iacute;nelo en <b>Mis tiendas</b>.</div>`;
+    }
+  }
   // Consolidado suma día a día
   const n=daysIn(currentYM);
   const cons=emptyData(currentYM);
@@ -878,7 +985,7 @@ async function renderResumen(){
 
   // KPIs
   document.getElementById("kpiStrip").innerHTML=`
-    <div class="kpi"><div class="lbl">Venta Consolidada${filtroTag}</div><div class="val" style="color:#3b82f6">S/ ${tv?fmt(tv):"—"}</div><div class="sub">${ids.length} tiendas</div></div>
+    <div class="kpi"><div class="lbl">Venta Consolidada${filtroTag}</div><div class="val" style="color:#3b82f6">${sim()} ${tv?fmt(tv):"—"}</div><div class="sub">${ids.length} tiendas</div></div>
     <div class="kpi"><div class="lbl">Receta</div><div class="val" style="color:#ef4444">${fmt(tFilt(cons,"receta"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"receta"))}</div></div>
     <div class="kpi"><div class="lbl">Merma</div><div class="val" style="color:#ef4444">${fmt(tFilt(cons,"merma"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"merma"))}</div></div>
     <div class="kpi"><div class="lbl">Ajuste</div><div class="val" style="color:${tFilt(cons,"ajuste")<0?"#ef4444":"#22c55e"}">${fmt(tFilt(cons,"ajuste"))||"—"}</div><div class="sub">${fmtPctV(pFilt(cons,"ajuste"))}</div></div>
@@ -931,7 +1038,7 @@ async function renderResumen(){
     <td style="color:#86efac">${fmt(tFilt(cons,"aej"))||"—"}</td><td style="color:#94a3b8">${fmtPctV(pFilt(cons,"aej"))}</td>
     <td style="color:#fbbf24">${tcv!==null?fmtPct(tcv):"—"}</td>
   </tr></tbody></table></div>`;
-  document.getElementById("mainContent").innerHTML=tbl;
+  document.getElementById("mainContent").innerHTML=avisoMoneda+tbl;
   renderVisualCV(ids,allData);
 }
 
@@ -989,6 +1096,22 @@ function renderGestionTiendas(){
         <button class="btn btn-ghost" style="font-size:.72rem;padding:5px 12px;" onclick="abrirCambiarPinZonaAdmin()">✏️ Cambiar PIN de zona</button>
       </div>
     </div>
+    <div class="admin-pin-box">
+      <h3>&#128178; Moneda y tipo de cambio</h3>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:.78rem;color:var(--muted)">Moneda de la zona:</span>
+        <select id="monedaSel" style="padding:7px 10px;font-size:.8rem;">${Object.entries(MONEDAS).map(([k,m])=>`<option value="${k}"${k===moneda?" selected":""}>${m.nombre}</option>`).join("")}</select>
+        <button class="btn btn-primary" style="font-size:.72rem;padding:6px 14px;" onclick="guardarMoneda()">Guardar</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;">
+        <span style="font-size:.78rem;color:var(--muted)">Tipo de cambio: 1 US$ =</span>
+        <input type="number" id="tcInput" step="0.001" min="0" value="${tipoCambio||""}" placeholder="3.75" style="width:90px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 9px;border-radius:7px;font-size:.8rem;outline:none;">
+        <span style="font-size:.78rem;color:var(--muted)">S/</span>
+        <button class="btn btn-primary" style="font-size:.72rem;padding:6px 14px;" onclick="guardarTipoCambio()">Guardar</button>
+      </div>
+      <span id="monedaMsg" style="font-size:.7rem;color:var(--muted);display:block;margin-top:8px"></span>
+      <p style="font-size:.68rem;color:var(--muted);margin-top:6px">Cada tienda puede elegir su propia moneda (tambi&eacute;n puedes cambiarla abajo, en su tarjeta). El <b>resumen consolidado</b> se muestra en la moneda de la zona y convierte con este tipo de cambio las tiendas que usan otra moneda. En la vista de cada tienda los montos se ven en su propia moneda y no se convierten.</p>
+    </div>
     <div class="actions">
       <div class="section-title" style="margin:0">${ids.length} tienda(s)</div>
       <button class="btn btn-primary" onclick="abrirModalTienda()">➕ Nueva tienda</button>
@@ -1000,6 +1123,7 @@ function renderGestionTiendas(){
     html+=`<div class="card">
       <h3>🏪 ${t.nombre}</h3>
       <div class="card-sub">PIN: <strong style="color:#a5b4fc">${t.pin}</strong></div>
+      <div class="card-sub">Moneda: <select onchange="guardarMonedaTiendaAdmin('${id}',this.value)" style="padding:3px 6px;font-size:.72rem;"><option value="">Igual que la zona (${MONEDAS[moneda].simbolo})</option>${Object.entries(MONEDAS).map(([k,m])=>`<option value="${k}"${t.moneda===k?" selected":""}>${m.nombre}</option>`).join("")}</select></div>
       <div class="card-actions">
         <button class="btn btn-ghost" onclick="verDatosTienda('${id}')">📋 Ver datos</button>
         <button class="btn btn-ghost" onclick="abrirCambiarPinTiendaAdmin('${id}')">🔑 PIN</button>
@@ -1147,6 +1271,7 @@ window.limpiarMesAdmin=function(){
 
 // ══ SUSCRIPCIÓN FIREBASE ══════════════════════════════════════════════════════
 function suscribirDatosTienda(zonaId,tiendaId,isAdmin=false){
+  monedaActiva=monedaDeTienda(tiendaId);aplicarMonedaDOM();
   if(dbListener){dbListener();dbListener=null;}
   const path=cvPath(zonaId,tiendaId,currentYM);
   dbListener=onValue(ref(db,path),snap=>{
@@ -1166,7 +1291,7 @@ function renderKPIs(){
   const entered=(localData.venta||[]).filter((v,i)=>i>=fd-1&&i<=fh-1&&v!=="").length;
   const filtroLabel=esFiltroActivo()?` <span style="font-size:.6rem;color:#a5b4fc;background:rgba(99,102,241,.15);border-radius:4px;padding:1px 6px">Días ${fd}–${fh}</span>`:"";
   document.getElementById("kpiStrip").innerHTML=`
-    <div class="kpi"><div class="lbl">Venta Total${filtroLabel}</div><div class="val" style="color:#3b82f6">S/ ${tv?fmt(tv):"—"}</div><div class="sub">${entered} días</div></div>
+    <div class="kpi"><div class="lbl">Venta Total${filtroLabel}</div><div class="val" style="color:#3b82f6">${sim()} ${tv?fmt(tv):"—"}</div><div class="sub">${entered} días</div></div>
     <div class="kpi"><div class="lbl">Receta</div><div class="val" style="color:#ef4444">${fmt(totalFilt(localData,"receta"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"receta"))}</div></div>
     <div class="kpi"><div class="lbl">Merma</div><div class="val" style="color:#ef4444">${fmt(totalFilt(localData,"merma"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"merma"))}</div></div>
     <div class="kpi"><div class="lbl">Ajuste</div><div class="val" style="color:${totalFilt(localData,"ajuste")<0?"#ef4444":"#22c55e"}">${fmt(totalFilt(localData,"ajuste"))||"—"}</div><div class="sub">${fmtPctV(totalPctFilt(localData,"ajuste"))}</div></div>
@@ -1348,9 +1473,9 @@ function renderMetas(zonaId,tiendaId){
     const pctDia=metaDiaria>0?Math.min(((ventaHoy||0)/metaDiaria)*100,999):0;
     const faltaDia=Math.max(metaDiaria-(ventaHoy||0),0);
     const cumplioDia=(ventaHoy||0)>=metaDiaria&&metaDiaria>0;
-    diaHtml=`<div class="meta-card"><div class="meta-lbl">Meta hoy (día ${today})</div><div class="meta-val">S/ ${fmt(ventaHoy||0)} <span style="color:var(--muted);font-weight:400;font-size:.8rem">/ ${fmt(metaDiaria)}</span></div><div class="meta-sub">${cumplioDia?`<span class="meta-cumplida">✓ Cumplida</span>`:`Falta <span class="meta-faltante">S/ ${fmt(faltaDia)}</span>`}</div><div class="meta-bar-track"><div class="meta-bar-fill" style="width:${Math.min(pctDia,100)}%;background:${cumplioDia?"#22c55e":"#3b82f6"}"></div></div></div>`;
+    diaHtml=`<div class="meta-card"><div class="meta-lbl">Meta hoy (día ${today})</div><div class="meta-val">${sim()} ${fmt(ventaHoy||0)} <span style="color:var(--muted);font-weight:400;font-size:.8rem">/ ${fmt(metaDiaria)}</span></div><div class="meta-sub">${cumplioDia?`<span class="meta-cumplida">✓ Cumplida</span>`:`Falta <span class="meta-faltante">${sim()} ${fmt(faltaDia)}</span>`}</div><div class="meta-bar-track"><div class="meta-bar-fill" style="width:${Math.min(pctDia,100)}%;background:${cumplioDia?"#22c55e":"#3b82f6"}"></div></div></div>`;
   }
-  cont.innerHTML=`<div class="metas-box"><div class="metas-header"><h3>🎯 Meta de ventas${filtroActivo?` <span style="font-size:.65rem;color:#a5b4fc;font-weight:400">· Días ${fd}–${fh}</span>`:""}</h3><button class="metas-edit-btn" onclick="abrirMeta('${zonaId}','${tiendaId}')">✏️ Editar</button></div><div class="metas-grid"><div class="meta-card"><div class="meta-lbl">Meta ${rangoLabel}</div><div class="meta-val">S/ ${fmt(ventaRango)} <span style="color:var(--muted);font-weight:400;font-size:.8rem">/ ${fmt(metaRango)}</span></div><div class="meta-sub">${cumplioRango?`<span class="meta-cumplida">✓ Cumplida</span>`:`Falta <span class="meta-faltante">S/ ${fmt(faltaRango)}</span> (${pctRango.toFixed(1)}%)`}</div><div class="meta-bar-track"><div class="meta-bar-fill" style="width:${Math.min(pctRango,100)}%;background:${cumplioRango?"#22c55e":"#3b82f6"}"></div></div></div>${diaHtml}</div></div>`;
+  cont.innerHTML=`<div class="metas-box"><div class="metas-header"><h3>🎯 Meta de ventas${filtroActivo?` <span style="font-size:.65rem;color:#a5b4fc;font-weight:400">· Días ${fd}–${fh}</span>`:""}</h3><button class="metas-edit-btn" onclick="abrirMeta('${zonaId}','${tiendaId}')">✏️ Editar</button></div><div class="metas-grid"><div class="meta-card"><div class="meta-lbl">Meta ${rangoLabel}</div><div class="meta-val">${sim()} ${fmt(ventaRango)} <span style="color:var(--muted);font-weight:400;font-size:.8rem">/ ${fmt(metaRango)}</span></div><div class="meta-sub">${cumplioRango?`<span class="meta-cumplida">✓ Cumplida</span>`:`Falta <span class="meta-faltante">${sim()} ${fmt(faltaRango)}</span> (${pctRango.toFixed(1)}%)`}</div><div class="meta-bar-track"><div class="meta-bar-fill" style="width:${Math.min(pctRango,100)}%;background:${cumplioRango?"#22c55e":"#3b82f6"}"></div></div></div>${diaHtml}</div></div>`;
 }
 window.abrirMeta=function(zonaId,tiendaId){
   document.getElementById("metaTiendaId").value=`${zonaId}|${tiendaId}`;
@@ -1550,7 +1675,7 @@ window.exportarConsolidadoExcel=function(){
   if(!ultimoConsolidado){alert("Carga primero el resumen consolidado.");return;}
   const {ids,allData,cons,ym}=ultimoConsolidado,labels=dayLabels(ym);
   const wb=XLSX.utils.book_new();
-  const resumen=[["Tienda","Venta","Receta","Receta%","Merma","Merma%","Ajuste","Ajuste%","AEJ","AEJ%","CV%"]];
+  const resumen=[["Tienda","Venta ("+MONEDAS[moneda].simbolo+")","Receta","Receta%","Merma","Merma%","Ajuste","Ajuste%","AEJ","AEJ%","CV%"]];
   ids.forEach(id=>{const d=allData[id];resumen.push([(tiendas[id]&&tiendas[id].nombre)||id,totalFor(d,"venta"),totalFor(d,"receta"),totalPctFor(d,"receta"),totalFor(d,"merma"),totalPctFor(d,"merma"),totalFor(d,"ajuste"),totalPctFor(d,"ajuste"),totalFor(d,"aej"),totalPctFor(d,"aej"),totalCV(d)]);});
   const wsR=XLSX.utils.aoa_to_sheet(resumen);XLSX.utils.book_append_sheet(wb,wsR,"Resumen");
   ids.forEach(id=>{const nombre=((tiendas[id]&&tiendas[id].nombre)||id).substring(0,28).replace(/[\\/?*[\]:]/g,"_");const ws=XLSX.utils.aoa_to_sheet(filasIndicadores(allData[id],labels));XLSX.utils.book_append_sheet(wb,ws,nombre);});
