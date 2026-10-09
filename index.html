@@ -245,33 +245,6 @@ footer{text-align:center;padding:10px;font-size:.65rem;color:var(--muted);border
 #modalCert .form-group input,#modalCert .form-group select{letter-spacing:normal;font-weight:500;width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:7px;font-size:16px;outline:none;}
 #modalCert .form-group input:focus,#modalCert .form-group select:focus{border-color:var(--accent);}
 
-/* TICKETS */
-.tk-badge{display:inline-block;min-width:17px;padding:1px 6px;margin-left:5px;border-radius:10px;background:#ef4444;color:#fff;font-size:.62rem;font-weight:800;text-align:center;line-height:1.4;}
-.tk-toast{position:fixed;top:14px;right:14px;z-index:1200;max-width:320px;background:var(--surface);border:1px solid var(--accent);border-left:4px solid #ef4444;border-radius:10px;padding:12px 16px;box-shadow:0 12px 32px rgba(0,0,0,.6);font-size:.78rem;line-height:1.5;cursor:pointer;display:none;}
-.tk-toast span{color:var(--muted);font-size:.68rem;}
-.tk-msg{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:1200;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 18px;font-size:.78rem;box-shadow:0 10px 28px rgba(0,0,0,.5);max-width:90%;text-align:center;}
-.cert-badge.tk-abierto{background:rgba(59,130,246,.12);color:#60a5fa;border-color:rgba(59,130,246,.35);}
-.cert-badge.tk-en_proceso{background:rgba(245,158,11,.12);color:#fbbf24;border-color:rgba(245,158,11,.35);}
-.cert-badge.tk-resuelto{background:rgba(34,197,94,.12);color:#22c55e;border-color:rgba(34,197,94,.35);}
-.cert-badge.tk-cerrado{background:rgba(100,116,139,.15);color:#94a3b8;border-color:rgba(100,116,139,.35);}
-.cert-badge.tkp-baja{background:rgba(100,116,139,.15);color:#94a3b8;border-color:rgba(100,116,139,.35);}
-.cert-badge.tkp-media{background:rgba(59,130,246,.12);color:#60a5fa;border-color:rgba(59,130,246,.35);}
-.cert-badge.tkp-alta{background:rgba(249,115,22,.12);color:#fb923c;border-color:rgba(249,115,22,.35);}
-.cert-badge.tkp-urgente{background:rgba(239,68,68,.15);color:#f87171;border-color:rgba(239,68,68,.4);}
-tr.tk-unread td{font-weight:700;background:rgba(59,130,246,.06);}
-.tk-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#3b82f6;margin-right:6px;}
-.tk-code{font-family:monospace;font-weight:700;color:#a5b4fc;letter-spacing:.04em;}
-.tk-meta{font-size:.72rem;color:var(--muted);margin:8px 0 12px;line-height:1.8;}
-.tk-desc{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:.82rem;line-height:1.6;margin-bottom:14px;word-break:break-word;}
-.tk-resp{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:8px;padding:12px 14px;font-size:.82rem;line-height:1.6;word-break:break-word;}
-.tk-resp label{display:block;font-size:.66rem;color:#22c55e;text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:4px;}
-#modalTicket .form-group input,#modalTicket .form-group select,#modalTicket .form-group textarea,
-#modalTicketDet .form-group select,#modalTicketDet .form-group textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:7px;font-size:16px;outline:none;font-family:inherit;letter-spacing:normal;font-weight:500;}
-#modalTicket .form-group input:focus,#modalTicket .form-group select:focus,#modalTicket .form-group textarea:focus,
-#modalTicketDet .form-group select:focus,#modalTicketDet .form-group textarea:focus{border-color:var(--accent);}
-#modalTicket textarea,#modalTicketDet textarea{resize:vertical;}
-#modalTicketDet .modal{max-height:90vh;overflow-y:auto;}
-
 /* CARNET DE SANIDAD */
 #modalCarnet .form-group input,#modalCarnet .form-group select{letter-spacing:normal;font-weight:500;width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:7px;font-size:16px;outline:none;}
 #modalCarnet .form-group input:focus,#modalCarnet .form-group select:focus{border-color:var(--accent);}
@@ -423,25 +396,6 @@ tr.tk-unread td{font-weight:700;background:rgba(59,130,246,.06);}
       <button class="btn btn-primary" onclick="guardarCert()">Guardar</button>
     </div>
   </div>
-</div>
-
-<div class="modal-overlay" id="modalTicket" style="display:none;">
-  <div class="modal">
-    <h2>&#127915; Nuevo ticket</h2>
-    <div class="form-group"><label>Categor&iacute;a</label><select id="tkCategoria"></select></div>
-    <div class="form-group"><label>Prioridad</label><select id="tkPrioridad"></select></div>
-    <div class="form-group"><label>T&iacute;tulo *</label><input type="text" id="tkTitulo" maxlength="80" placeholder="Ej: La freidora no enciende"></div>
-    <div class="form-group"><label>Descripci&oacute;n *</label><textarea id="tkDescripcion" rows="4" maxlength="800" placeholder="Describe el problema o la solicitud con el mayor detalle posible"></textarea></div>
-    <div class="modal-error" id="errorTicket"></div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary" id="btnGuardarTicket" onclick="guardarTicket()">Enviar ticket</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modalTicketDet" style="display:none;">
-  <div class="modal" style="max-width:520px;" id="ticketDetBody"></div>
 </div>
 
 <div class="modal-overlay" id="modalCarnet" style="display:none;">
@@ -706,7 +660,7 @@ async function buscarTiendaEnZonas(pin){
 }
 
 window.doLogout=function(){
-  moneda="PEN";monedaActiva="PEN";tipoCambio=0;{const x=document.getElementById("monedaTiendaSel");if(x)x.remove();}aplicarMonedaDOM();detenerTickets();session=null;localData={};tiendas={};certificados={};carnets={};currentTab="resumen";
+  moneda="PEN";monedaActiva="PEN";tipoCambio=0;{const x=document.getElementById("monedaTiendaSel");if(x)x.remove();}aplicarMonedaDOM();session=null;localData={};tiendas={};certificados={};carnets={};currentTab="resumen";
   if(dbListener){dbListener();dbListener=null;}
   document.getElementById("appScreen").style.display="none";
   document.getElementById("loginScreen").style.display="flex";
@@ -737,7 +691,6 @@ async function startApp(){
     tiendas=snap.exists()?snap.val():{};
     document.getElementById("appTabs").style.display="flex";
     renderZonaAdminTabs();
-    iniciarTickets();
     switchTab("resumen");
   } else {
     // Tienda
@@ -748,7 +701,6 @@ async function startApp(){
     document.getElementById("appTabs").style.display="flex";
     renderTiendaTabs();
     crearSelectorMonedaTienda();
-    iniciarTickets();
     switchTab("tdatos");
   }
 }
@@ -895,18 +847,15 @@ function renderZonaAdminTabs(){
     {id:"datos",label:"📋 Ver tienda"},
     {id:"objetivos",label:"🎯 Objetivos CV"},
     {id:"certificados",label:"📄 Certificados"},
-    {id:"tickets",label:"\ud83c\udfab Tickets <span class=\"tk-badge\" id=\"tkBadge\" style=\"display:none\"></span>"},
     {id:"carnets",label:"\ud83e\ude7a Carnet de sanidad"},
   ];
   document.getElementById("appTabs").innerHTML=tabs.map(t=>`<div class="tab" id="tab-${t.id}" onclick="switchTab('${t.id}')">${t.label}</div>`).join("");
-  actualizarBadgeTickets();
 }
 
 function renderTiendaTabs(){
   const tabs=[
     {id:"tdatos",label:"\ud83d\udcdd Ingreso de datos"},
     {id:"certificados",label:"\ud83d\udcc4 Certificados"},
-    {id:"tickets",label:"\ud83c\udfab Tickets"},
     {id:"carnets",label:"\ud83e\ude7a Carnet de sanidad"},
   ];
   document.getElementById("appTabs").innerHTML=tabs.map(t=>`<div class="tab" id="tab-${t.id}" onclick="switchTab('${t.id}')">${t.label}</div>`).join("");
@@ -926,7 +875,6 @@ window.switchTab=function(tab){
     document.getElementById("monthSel").style.display=vis;
     const msel=document.getElementById("monedaTiendaSel");if(msel)msel.style.display=vis;
     if(tab==="certificados")renderCertificados();
-    else if(tab==="tickets")renderTickets();
     else if(tab==="carnets")renderCarnets();
     else suscribirDatosTienda(session.zonaId,session.tiendaId);
     return;
@@ -935,7 +883,6 @@ window.switchTab=function(tab){
   else if(tab==="tiendas")renderGestionTiendas();
   else if(tab==="objetivos")renderPanelObjetivos();
   else if(tab==="certificados")renderCertificados();
-  else if(tab==="tickets")renderTickets();
   else if(tab==="carnets")renderCarnets();
   else renderVerTienda();
 };
@@ -1789,7 +1736,7 @@ window.procesarImportJSON=async function(input){
 
 // ══ CLOSE MODAL ═══════════════════════════════════════════════════════════════
 window.closeModal=function(){
-  ["modalZona","modalTienda","modalEliminar","modalCambiarPin","modalMeta","modalObjetivos","modalCert","modalTicket","modalTicketDet","modalCarnet"].forEach(id=>{
+  ["modalZona","modalTienda","modalEliminar","modalCambiarPin","modalMeta","modalObjetivos","modalCert","modalCarnet"].forEach(id=>{
     const el=document.getElementById(id);if(el)el.style.display="none";
   });
 };
@@ -1952,282 +1899,6 @@ window.eliminarCert=async function(id){
   try{await remove(ref(db,certPath(session.zonaId)+"/"+id));}
   catch(e){console.error(e);alert("No se pudo eliminar el certificado.");}
 };
-
-// -- TICKETS --------------------------------------------------------------
-const TICKET_CATEGORIAS=["Mantenimiento","Equipos y maquinaria","Sistemas / POS","Limpieza y qu\u00edmicos","Abastecimiento / Inventario","Certificados y documentos","Otro"];
-const TICKET_PRIORIDADES=[["baja","Baja"],["media","Media"],["alta","Alta"],["urgente","Urgente"]];
-const TICKET_ESTADOS=[["abierto","Abierto"],["en_proceso","En proceso"],["resuelto","Resuelto"],["cerrado","Cerrado"]];
-let tickets={},ticketsListener=null,ticketsPrimeraCarga=true,ticketDetId=null;
-
-function ticketPath(zid){return`zonas/${zid}/tickets`;}
-function ticketLabel(lista,v){const f=lista.find(x=>x[0]===v);return f?f[1]:v;}
-function ticketFecha(iso){
-  if(!iso)return"--";
-  const d=new Date(iso);
-  return d.toLocaleDateString("es-PE",{timeZone:PERU_TZ})+" "+d.toLocaleTimeString("es-PE",{timeZone:PERU_TZ,hour:"2-digit",minute:"2-digit"});
-}
-function ticketsVisibles(){
-  return Object.entries(tickets).filter(([,t])=>session.role!=="tienda"||t.tiendaId===session.tiendaId);
-}
-function tkMsg(texto){
-  const el=document.createElement("div");
-  el.className="tk-msg";el.textContent=texto;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),5500);
-}
-
-// --- Escucha en tiempo real (avisos dentro de la app) ---
-function iniciarTickets(){
-  detenerTickets();
-  ticketsPrimeraCarga=true;
-  ticketsListener=onValue(ref(db,ticketPath(session.zonaId)),snap=>{
-    const nuevos=snap.exists()?snap.val():{};
-    if(!ticketsPrimeraCarga&&session&&session.role==="zonaadmin"){
-      Object.entries(nuevos).forEach(([id,t])=>{if(!tickets[id]&&!t.leido)avisarNuevoTicket(t);});
-    }
-    tickets=nuevos;
-    ticketsPrimeraCarga=false;
-    actualizarBadgeTickets();
-    if(currentTab==="tickets"){pintarTickets();}
-  },()=>{});
-}
-function detenerTickets(){
-  if(ticketsListener){ticketsListener();ticketsListener=null;}
-  tickets={};ticketsPrimeraCarga=true;
-}
-function actualizarBadgeTickets(){
-  const el=document.getElementById("tkBadge");
-  if(!el)return;
-  const n=Object.values(tickets).filter(t=>!t.leido).length;
-  el.textContent=n>99?"99+":String(n);
-  el.style.display=n>0?"inline-block":"none";
-}
-function avisarNuevoTicket(t){
-  let el=document.getElementById("tkToast");
-  if(!el){
-    el=document.createElement("div");el.id="tkToast";el.className="tk-toast";
-    el.onclick=()=>{el.style.display="none";switchTab("tickets");};
-    document.body.appendChild(el);
-  }
-  el.innerHTML=`<strong>\ud83c\udfab Nuevo ticket</strong><br>${escCert(t.tiendaNombre)}: ${escCert(t.titulo)}<br><span>Toca para verlo</span>`;
-  el.style.display="block";
-  clearTimeout(el._t);el._t=setTimeout(()=>{el.style.display="none";},12000);
-  try{
-    if("Notification" in window&&Notification.permission==="granted"){
-      new Notification("Nuevo ticket - "+(t.tiendaNombre||""),{body:t.titulo||""});
-    }
-  }catch(e){}
-}
-
-// --- Pantalla principal de la pestana ---
-function renderTickets(){
-  const esT=session.role==="tienda";
-  const panelAdmin=esT?"":`
-    <div class="admin-pin-box">
-      <h3>&#128276; Avisos de nuevos tickets</h3>
-      <p style="font-size:.72rem;color:var(--muted);margin:4px 0 10px">Cuando una tienda cree un ticket ver&aacute;s un globo rojo en esta pesta&ntilde;a y un aviso en pantalla mientras la app est&eacute; abierta.</p>
-      <button class="btn btn-ghost" id="tkNotifBtn" onclick="activarAvisosNavegador()" style="display:none">&#128276; Activar avisos del navegador</button>
-    </div>`;
-  document.getElementById("mainContent").innerHTML=`
-    ${panelAdmin}
-    <div class="actions">
-      <div class="section-title" style="margin:0" id="tkCount"></div>
-      ${esT?`<button class="btn btn-primary" onclick="abrirModalTicket()">&#10133; Nuevo ticket</button>`:""}
-    </div>
-    <div class="cert-filter">
-      <input type="text" id="tkFiltroTxt" placeholder="&#128269; Buscar ticket..." oninput="pintarTickets()">
-      <select id="tkFiltroEstado" onchange="pintarTickets()">
-        <option value="">Todos los estados</option>
-        ${TICKET_ESTADOS.map(e=>`<option value="${e[0]}">${e[1]}</option>`).join("")}
-      </select>
-      <select id="tkFiltroPrior" onchange="pintarTickets()">
-        <option value="">Toda prioridad</option>
-        ${TICKET_PRIORIDADES.map(e=>`<option value="${e[0]}">${e[1]}</option>`).join("")}
-      </select>
-      ${esT?"":`<select id="tkFiltroTienda" onchange="pintarTickets()">
-        <option value="">Todas las tiendas</option>
-        ${Object.entries(tiendas).map(([id,t])=>`<option value="${id}">${escCert(t.nombre)}</option>`).join("")}
-      </select>`}
-    </div>
-    <div class="table-wrap"><table class="cert-table"><thead><tr>
-      <th>C&oacute;digo</th><th>Fecha</th>${esT?"":"<th>Tienda</th>"}<th>Categor&iacute;a</th><th>T&iacute;tulo</th><th>Prioridad</th><th>Estado</th><th></th>
-    </tr></thead><tbody id="tkTbody"></tbody></table></div>`;
-  if(!esT){
-    const b=document.getElementById("tkNotifBtn");
-    if(b&&"Notification" in window&&Notification.permission==="default")b.style.display="";
-  }
-  pintarTickets();
-}
-
-window.pintarTickets=function(){
-  const tbody=document.getElementById("tkTbody");
-  if(!tbody)return;
-  const esT=session.role==="tienda";
-  const all=ticketsVisibles();
-  const cnt=e=>all.filter(([,t])=>t.estado===e).length;
-  const sinLeer=all.filter(([,t])=>!t.leido).length;
-  document.getElementById("kpiStrip").innerHTML=`
-    <div class="kpi"><div class="lbl">Total tickets</div><div class="val">${all.length}</div></div>
-    ${esT?"":`<div class="kpi"><div class="lbl">Sin leer</div><div class="val" style="color:${sinLeer?"#f87171":"var(--text)"}">${sinLeer}</div></div>`}
-    <div class="kpi"><div class="lbl">Abiertos</div><div class="val" style="color:${cnt("abierto")?"#60a5fa":"var(--text)"}">${cnt("abierto")}</div></div>
-    <div class="kpi"><div class="lbl">En proceso</div><div class="val" style="color:${cnt("en_proceso")?"#fbbf24":"var(--text)"}">${cnt("en_proceso")}</div></div>
-    <div class="kpi"><div class="lbl">Resueltos / cerrados</div><div class="val">${cnt("resuelto")+cnt("cerrado")}</div></div>`;
-  const txt=(document.getElementById("tkFiltroTxt").value||"").toLowerCase();
-  const fe=document.getElementById("tkFiltroEstado").value;
-  const fp=document.getElementById("tkFiltroPrior").value;
-  const ftEl=document.getElementById("tkFiltroTienda");
-  const ft=ftEl?ftEl.value:"";
-  const arr=all.filter(([,t])=>{
-    if(txt&&!((t.titulo||"")+" "+(t.descripcion||"")+" "+(t.codigo||"")).toLowerCase().includes(txt))return false;
-    if(fe&&t.estado!==fe)return false;
-    if(fp&&t.prioridad!==fp)return false;
-    if(ft&&t.tiendaId!==ft)return false;
-    return true;
-  }).sort((a,b)=>String(b[1].creado||"").localeCompare(String(a[1].creado||"")));
-  document.getElementById("tkCount").textContent=`${arr.length} ticket(s)`;
-  const cols=esT?7:8;
-  if(!arr.length){
-    tbody.innerHTML=`<tr><td colspan="${cols}" style="text-align:center;padding:30px;color:var(--muted)">${all.length?"Ning\u00fan ticket coincide con el filtro":(esT?"A\u00fan no has creado tickets.":"Sin tickets por ahora.")}</td></tr>`;
-    return;
-  }
-  tbody.innerHTML=arr.map(([id,t])=>{
-    const unread=!esT&&!t.leido;
-    return`<tr class="${unread?"tk-unread":""}">
-      <td><span class="tk-code">${unread?`<span class="tk-dot"></span>`:""}${escCert(t.codigo)}</span></td>
-      <td style="white-space:nowrap">${ticketFecha(t.creado)}</td>
-      ${esT?"":`<td>${escCert(t.tiendaNombre)}</td>`}
-      <td>${escCert(t.categoria)}</td>
-      <td>${escCert(t.titulo)}</td>
-      <td><span class="cert-badge tkp-${escCert(t.prioridad)}">${escCert(ticketLabel(TICKET_PRIORIDADES,t.prioridad))}</span></td>
-      <td><span class="cert-badge tk-${escCert(t.estado)}">${escCert(ticketLabel(TICKET_ESTADOS,t.estado))}</span></td>
-      <td><button class="btn btn-ghost" style="padding:4px 12px;min-height:30px" onclick="abrirTicketDet('${id}')">Ver</button></td>
-    </tr>`;
-  }).join("");
-};
-
-// --- Crear ticket (tienda) ---
-window.abrirModalTicket=function(){
-  if(session.role!=="tienda")return;
-  document.getElementById("tkCategoria").innerHTML=TICKET_CATEGORIAS.map(c=>`<option value="${escCert(c)}">${escCert(c)}</option>`).join("");
-  document.getElementById("tkPrioridad").innerHTML=TICKET_PRIORIDADES.map(p=>`<option value="${p[0]}">${p[1]}</option>`).join("");
-  document.getElementById("tkPrioridad").value="media";
-  document.getElementById("tkTitulo").value="";
-  document.getElementById("tkDescripcion").value="";
-  document.getElementById("errorTicket").style.display="none";
-  document.getElementById("btnGuardarTicket").disabled=false;
-  document.getElementById("modalTicket").style.display="flex";
-};
-
-window.guardarTicket=async function(){
-  if(session.role!=="tienda")return;
-  const err=document.getElementById("errorTicket");
-  const titulo=document.getElementById("tkTitulo").value.trim();
-  const descripcion=document.getElementById("tkDescripcion").value.trim();
-  if(!titulo||!descripcion){err.textContent="Escribe el t\u00edtulo y la descripci\u00f3n del ticket.";err.style.display="block";return;}
-  const btn=document.getElementById("btnGuardarTicket");
-  btn.disabled=true;
-  const ahora=Date.now();
-  const id="k"+ahora.toString(36)+Math.random().toString(36).slice(2,6);
-  const iso=new Date(ahora).toISOString();
-  const data={
-    codigo:"TK-"+ahora.toString(36).slice(-5).toUpperCase(),
-    titulo,descripcion,
-    categoria:document.getElementById("tkCategoria").value,
-    prioridad:document.getElementById("tkPrioridad").value,
-    estado:"abierto",
-    tiendaId:session.tiendaId,tiendaNombre:session.tiendaNombre,
-    creado:iso,actualizado:iso,leido:false,respuesta:""
-  };
-  setSynced(false);
-  try{
-    await set(ref(db,ticketPath(session.zonaId)+"/"+id),data);
-  }catch(e){
-    console.error(e);
-    err.textContent="No se pudo crear el ticket. Revisa tu conexi\u00f3n.";err.style.display="block";
-    btn.disabled=false;setSynced(false,true);return;
-  }
-  closeModal();
-  tkMsg("\u2705 Ticket creado. Tu supervisor fue notificado.");
-};
-
-// --- Detalle (tienda: solo lectura / supervisor: gestion) ---
-window.abrirTicketDet=function(id){
-  const t=tickets[id];
-  if(!t)return;
-  if(session.role==="tienda"&&t.tiendaId!==session.tiendaId)return;
-  ticketDetId=id;
-  const esT=session.role==="tienda";
-  if(!esT&&!t.leido){
-    update(ref(db,ticketPath(session.zonaId)+"/"+id),{leido:true}).catch(()=>{});
-  }
-  const desc=escCert(t.descripcion).replace(/\n/g,"<br>");
-  let bloque;
-  if(esT){
-    bloque=t.respuesta
-      ?`<div class="tk-resp"><label>Respuesta del supervisor</label>${escCert(t.respuesta).replace(/\n/g,"<br>")}</div>`
-      :`<p style="font-size:.76rem;color:var(--muted)">A\u00fan no hay respuesta del supervisor.</p>`;
-  }else{
-    bloque=`
-      <div class="form-group"><label>Estado</label>
-        <select id="tkDetEstado">${TICKET_ESTADOS.map(e=>`<option value="${e[0]}"${e[0]===t.estado?" selected":""}>${e[1]}</option>`).join("")}</select></div>
-      <div class="form-group"><label>Respuesta / comentario para la tienda</label>
-        <textarea id="tkDetResp" rows="3" maxlength="800" placeholder="Escribe una respuesta o indicaci\u00f3n...">${escCert(t.respuesta||"")}</textarea></div>`;
-  }
-  document.getElementById("ticketDetBody").innerHTML=`
-    <h2>&#127915; <span class="tk-code">${escCert(t.codigo)}</span> &middot; ${escCert(t.titulo)}</h2>
-    <div class="tk-meta">
-      Tienda: <b>${escCert(t.tiendaNombre)}</b> &middot; Categor&iacute;a: <b>${escCert(t.categoria)}</b><br>
-      Prioridad: <span class="cert-badge tkp-${escCert(t.prioridad)}">${escCert(ticketLabel(TICKET_PRIORIDADES,t.prioridad))}</span>
-      &nbsp;Estado: <span class="cert-badge tk-${escCert(t.estado)}">${escCert(ticketLabel(TICKET_ESTADOS,t.estado))}</span><br>
-      Creado: ${ticketFecha(t.creado)}${t.actualizado&&t.actualizado!==t.creado?` &middot; Actualizado: ${ticketFecha(t.actualizado)}`:""}
-    </div>
-    <div class="tk-desc">${desc}</div>
-    ${bloque}
-    <div class="modal-error" id="errorTicketDet"></div>
-    <div class="modal-actions">
-      ${esT?"":`<button class="btn btn-danger" style="margin-right:auto" onclick="eliminarTicket()">Eliminar</button>`}
-      <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
-      ${esT?"":`<button class="btn btn-primary" onclick="guardarTicketDet()">Guardar</button>`}
-    </div>`;
-  document.getElementById("modalTicketDet").style.display="flex";
-};
-
-window.guardarTicketDet=async function(){
-  if(session.role!=="zonaadmin"||!ticketDetId||!tickets[ticketDetId])return;
-  const err=document.getElementById("errorTicketDet");
-  try{
-    await update(ref(db,ticketPath(session.zonaId)+"/"+ticketDetId),{
-      estado:document.getElementById("tkDetEstado").value,
-      respuesta:document.getElementById("tkDetResp").value.trim(),
-      actualizado:new Date().toISOString(),
-      leido:true
-    });
-    closeModal();
-  }catch(e){
-    console.error(e);
-    err.textContent="No se pudo guardar. Revisa tu conexi\u00f3n.";err.style.display="block";
-  }
-};
-
-window.eliminarTicket=async function(){
-  if(session.role!=="zonaadmin"||!ticketDetId||!tickets[ticketDetId])return;
-  if(!confirm(`\u00bfEliminar el ticket ${tickets[ticketDetId].codigo}? Esta acci\u00f3n no se puede deshacer.`))return;
-  try{
-    await remove(ref(db,ticketPath(session.zonaId)+"/"+ticketDetId));
-    closeModal();
-  }catch(e){console.error(e);alert("No se pudo eliminar el ticket.");}
-};
-
-// --- Avisos del navegador (supervisor) ---
-window.activarAvisosNavegador=async function(){
-  try{
-    const p=await Notification.requestPermission();
-    const b=document.getElementById("tkNotifBtn");
-    if(b&&p!=="default")b.style.display="none";
-    if(p==="granted")tkMsg("\uD83D\uDD14 Avisos del navegador activados.");
-  }catch(e){}
-};
-
 
 // -- CARNET DE SANIDAD -----------------------------------------------------
 let carnets={};
