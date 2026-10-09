@@ -660,7 +660,7 @@ async function buscarTiendaEnZonas(pin){
 }
 
 window.doLogout=function(){
-  moneda="PEN";monedaActiva="PEN";tipoCambio=0;{const x=document.getElementById("monedaTiendaSel");if(x)x.remove();}aplicarMonedaDOM();session=null;localData={};tiendas={};certificados={};carnets={};currentTab="resumen";
+  moneda="PEN";monedaActiva="PEN";tipoCambio=0;{const x=document.getElementById("monedaTiendaSel");if(x)x.remove();}aplicarMonedaDOM();dashDetener();session=null;localData={};tiendas={};certificados={};carnets={};currentTab="resumen";
   if(dbListener){dbListener();dbListener=null;}
   document.getElementById("appScreen").style.display="none";
   document.getElementById("loginScreen").style.display="flex";
@@ -679,8 +679,9 @@ async function startApp(){
     document.getElementById("headerSub").textContent="Gestión de zonas";
     document.getElementById("yearSel").style.display="none";
     document.getElementById("monthSel").style.display="none";
-    document.getElementById("appTabs").style.display="none";
-    renderSuperAdmin();
+    document.getElementById("appTabs").style.display="flex";
+    document.getElementById("appTabs").innerHTML=[["zonas","\ud83c\udfe2 Zonas"],["dashcarnets","\ud83e\ude7a Carnet de sanidad"]].map(t=>`<div class="tab" id="tab-${t[0]}" onclick="switchTab('${t[0]}')">${t[1]}</div>`).join("");
+    switchTab("zonas");
   } else if(session.role==="zonaadmin"){
     document.getElementById("headerTitle").textContent=session.zonaNombre;
     document.getElementById("headerSub").textContent="Administrador de zona";
@@ -862,13 +863,17 @@ function renderTiendaTabs(){
 }
 
 window.switchTab=function(tab){
-  currentTab=tab;
+  currentTab=tab;dashTok++;dashDetener();
   document.querySelectorAll(".tab").forEach(t=>{
     t.className="tab"+(t.id==="tab-"+tab?" active":"");
   });
   if(dbListener){dbListener();dbListener=null;}
   document.getElementById("mainContent").innerHTML="";
   document.getElementById("kpiStrip").innerHTML="";
+  if(session.role==="superadmin"){
+    if(tab==="dashcarnets")renderDashCarnets();else renderSuperAdmin();
+    return;
+  }
   if(session.role==="tienda"){
     const vis=tab==="tdatos"?"":"none";
     document.getElementById("yearSel").style.display=vis;
@@ -883,7 +888,7 @@ window.switchTab=function(tab){
   else if(tab==="tiendas")renderGestionTiendas();
   else if(tab==="objetivos")renderPanelObjetivos();
   else if(tab==="certificados")renderCertificados();
-  else if(tab==="carnets")renderCarnets();
+  else if(tab==="carnets"){carnetVista="resumen";renderDashCarnets();}
   else renderVerTienda();
 };
 
@@ -1915,6 +1920,7 @@ const CARNET_ALERTA={"vencido":"Vencido","proximo-7":"Por vencer (7 d\u00edas)",
 function renderCarnets(){
   const esT=session.role==="tienda";
   document.getElementById("mainContent").innerHTML=`
+    ${carnetToggle("lista")}
     <div class="actions">
       <div class="section-title" style="margin:0" id="csCount"></div>
       <button class="btn btn-primary" onclick="abrirModalCarnet()">&#10133; Nuevo carnet</button>
@@ -2058,6 +2064,153 @@ window.eliminarCarnet=async function(id){
   if(!confirm(`\u00bfEliminar el carnet de ${c.nombre} ${c.apellido}?`))return;
   try{await remove(ref(db,carnetPath(session.zonaId)+"/"+id));}
   catch(e){console.error(e);alert("No se pudo eliminar el carnet.");}
+};
+
+
+// -- DASHBOARD DE CARNETS (Super Admin y admin de zona) --------------------
+let carnetVista="resumen",dashTok=0;
+function carnetToggle(act){
+  if(!session||session.role!=="zonaadmin")return"";
+  const b=(v,l)=>`<button class="btn ${act===v?"btn-primary":"btn-ghost"}" onclick="verCarnetVista('${v}')">${l}</button>`;
+  return`<div style="display:flex;gap:8px;margin-bottom:14px">${b("resumen","&#128202; Resumen")}${b("lista","&#128203; Lista")}</div>`;
+}
+window.verCarnetVista=function(v){
+  if(!session||session.role!=="zonaadmin")return;
+  if(dbListener){dbListener();dbListener=null;}
+  dashTok++;dashDetener();
+  document.getElementById("kpiStrip").innerHTML="";
+  carnetVista=v;
+  if(v==="lista")renderCarnets();else renderDashCarnets();
+};
+let dashCarnets=[];
+const DASH_COL={vencido:"#f87171","proximo-7":"#fb923c","proximo-15":"#fbbf24",vigente:"#22c55e"};
+function dashStats(rows){
+  const s={t:rows.length,v:0,p7:0,p15:0,ok:0};
+  rows.forEach(r=>{if(r.est==="vencido")s.v++;else if(r.est==="proximo-7")s.p7++;else if(r.est==="proximo-15")s.p15++;else s.ok++;});
+  return s;
+}
+function dashPct(n,t){return t?(Math.round(n/t*1000)/10).toFixed(1)+"%":"0.0%";}
+function dashBar(s){
+  if(!s.t)return`<div style="height:10px;border-radius:5px;background:var(--surface2);min-width:120px"></div>`;
+  const seg=(n,c,t)=>n?`<div title="${t}: ${n}" style="width:${n/s.t*100}%;background:${c}"></div>`:"";
+  return`<div style="display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--surface2);min-width:120px">${seg(s.v,DASH_COL.vencido,"Vencidos")}${seg(s.p7,DASH_COL["proximo-7"],"Por vencer 7 d")}${seg(s.p15,DASH_COL["proximo-15"],"Por vencer 15 d")}${seg(s.ok,DASH_COL.vigente,"Vigentes")}</div>`;
+}
+let dashUnsubs=[],dashRaw={},dashListos={};
+function dashDetener(){dashUnsubs.forEach(f=>{try{f();}catch(e){}});dashUnsubs=[];}
+function dashReconstruir(){
+  dashCarnets=[];
+  Object.entries(dashRaw).forEach(([zid,r])=>{
+    Object.entries(r.carnets||{}).forEach(([id,c])=>{
+      const tn=(c.tiendaId&&r.tiendas&&r.tiendas[c.tiendaId]?r.tiendas[c.tiendaId].nombre:c.tienda)||"Sin tienda";
+      dashCarnets.push({id,zid,zona:(zonas[zid]&&zonas[zid].nombre)||zid,tiendaId:c.tiendaId||"",tienda:tn,
+        nombre:c.nombre||"",apellido:c.apellido||"",cargo:c.cargo||"",venc:c.vencimiento,dias:certDias(c.vencimiento),est:certEstado(c.vencimiento)});
+    });
+  });
+}
+function renderDashCarnets(){
+  dashDetener();
+  const tok=++dashTok;
+  const esSuper=session.role==="superadmin";
+  const ids=esSuper?Object.keys(zonas):[session.zonaId];
+  dashRaw={};dashListos={};dashCarnets=[];
+  document.getElementById("kpiStrip").innerHTML="";
+  document.getElementById("mainContent").innerHTML=`
+    ${carnetToggle("resumen")}
+    <div class="actions">
+      <div class="section-title" style="margin:0" id="dcCount"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${esSuper?`<select id="dcZona" onchange="pintarDashCarnets()" style="padding:7px 10px;font-size:.78rem">
+          <option value="">Todas las zonas</option>
+          ${Object.entries(zonas).map(([id,z])=>`<option value="${id}">${escCert(z.nombre)}</option>`).join("")}
+        </select>`:""}
+        <button class="btn btn-primary" onclick="exportarDashCarnets()">&#128196; Exportar Excel</button>
+      </div>
+    </div>
+    <div id="dcBody"><p style="padding:20px;color:var(--muted)">Cargando carnets...</p></div>`;
+  const refrescar=()=>{
+    if(tok!==dashTok)return;
+    if(!ids.every(z=>dashListos[z+"|c"]&&dashListos[z+"|t"]))return;
+    dashReconstruir();pintarDashCarnets();setSynced(true);
+  };
+  const fallo=e=>{
+    if(tok!==dashTok)return;
+    console.error(e);setSynced(false,true);
+    const b=document.getElementById("dcBody");
+    if(b)b.innerHTML=`<p style="padding:20px;color:#f87171">No se pudieron cargar los carnets. Revisa tu conexi&oacute;n.</p>`;
+  };
+  ids.forEach(zid=>{
+    dashRaw[zid]={carnets:{},tiendas:{}};
+    dashUnsubs.push(onValue(ref(db,carnetPath(zid)),snap=>{
+      dashRaw[zid].carnets=snap.exists()?snap.val():{};dashListos[zid+"|c"]=true;refrescar();
+    },fallo));
+    dashUnsubs.push(onValue(ref(db,`zonas/${zid}/tiendas`),snap=>{
+      dashRaw[zid].tiendas=snap.exists()?snap.val():{};dashListos[zid+"|t"]=true;refrescar();
+    },fallo));
+  });
+}
+function dcZonaVal(){const el=document.getElementById("dcZona");return el?el.value:"";}
+function dashFiltrados(){
+  const z=dcZonaVal();
+  return z?dashCarnets.filter(r=>r.zid===z):dashCarnets;
+}
+window.pintarDashCarnets=function(){
+  const body=document.getElementById("dcBody");
+  if(!body)return;
+  const rows=dashFiltrados();
+  const s=dashStats(rows);
+  const por=s.p7+s.p15;
+  document.getElementById("dcCount").textContent=`${s.t} carnet(s)`;
+  document.getElementById("kpiStrip").innerHTML=`
+    <div class="kpi"><div class="lbl">Total carnets</div><div class="val">${s.t}</div></div>
+    <div class="kpi"><div class="lbl">Vigentes</div><div class="val" style="color:${DASH_COL.vigente}">${s.ok}</div><div class="sub">${dashPct(s.ok,s.t)}</div></div>
+    <div class="kpi"><div class="lbl">Por vencer (15 d&iacute;as o menos)</div><div class="val" style="color:${por?DASH_COL["proximo-15"]:"var(--text)"}">${por}</div><div class="sub">${dashPct(por,s.t)} &middot; ${s.p7} en 7 d&iacute;as o menos</div></div>
+    <div class="kpi"><div class="lbl">Vencidos</div><div class="val" style="color:${s.v?DASH_COL.vencido:"var(--text)"}">${s.v}</div><div class="sub">${dashPct(s.v,s.t)}</div></div>`;
+  if(!s.t){
+    body.innerHTML=`<p style="padding:20px;color:var(--muted)">A&uacute;n no hay carnets registrados${dcZonaVal()?" en esta zona":""}.</p>`;
+    return;
+  }
+  const leyenda=`<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:.68rem;color:var(--muted);margin:6px 0 16px">
+    ${[["vencido","Vencido"],["proximo-7","Por vencer (7 d)"],["proximo-15","Por vencer (15 d)"],["vigente","Vigente"]].map(([k,l])=>`<span><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${DASH_COL[k]};margin-right:5px"></span>${l}</span>`).join("")}</div>`;
+  const fila=(nombre,sub,st)=>`<tr>
+    <td><strong>${escCert(nombre)}</strong>${sub?`<br><span style="color:var(--muted);font-size:.66rem">${escCert(sub)}</span>`:""}</td>
+    <td>${st.t}</td>
+    <td style="color:${st.v?DASH_COL.vencido:"inherit"}">${st.v} <span style="color:var(--muted)">(${dashPct(st.v,st.t)})</span></td>
+    <td style="color:${st.p7+st.p15?DASH_COL["proximo-15"]:"inherit"}">${st.p7+st.p15} <span style="color:var(--muted)">(${dashPct(st.p7+st.p15,st.t)})</span></td>
+    <td style="color:${DASH_COL.vigente}">${st.ok} <span style="color:var(--muted)">(${dashPct(st.ok,st.t)})</span></td></tr>`;
+  const cab=p=>`<thead><tr><th>${p}</th><th>Total</th><th>Vencidos</th><th>Por vencer</th><th>Vigentes</th></tr></thead>`;
+  // Por zona
+  const zonasVisibles=dcZonaVal()?[dcZonaVal()]:Object.keys(zonas);
+  const tZona=session.role!=="superadmin"?"":`<div class="section-title">Por zona</div><div class="table-wrap"><table class="cert-table">${cab("Zona")}<tbody>${
+    zonasVisibles.map(zid=>fila((zonas[zid]&&zonas[zid].nombre)||zid,"",dashStats(rows.filter(r=>r.zid===zid)))).join("")}</tbody></table></div>`;
+  // Por tienda
+  const claves={};
+  rows.forEach(r=>{const k=r.zid+"|"+(r.tiendaId||r.tienda);(claves[k]=claves[k]||{zona:r.zona,tienda:r.tienda,rows:[]}).rows.push(r);});
+  const tTienda=`<div class="section-title">Por tienda</div><div class="table-wrap"><table class="cert-table">${cab("Tienda")}<tbody>${
+    Object.values(claves).sort((a,b)=>dashStats(b.rows).v-dashStats(a.rows).v||a.tienda.localeCompare(b.tienda)).map(g=>fila(g.tienda,g.zona,dashStats(g.rows))).join("")}</tbody></table></div>`;
+  // Atención requerida
+  const aten=rows.filter(r=>r.est!=="vigente").sort((a,b)=>(a.dias??9999)-(b.dias??9999));
+  const tAten=`<div class="section-title">Atenci&oacute;n requerida (${aten.length})</div>`+(aten.length?`<div class="table-wrap"><table class="cert-table"><thead><tr>
+    <th>Colaborador</th><th>Cargo</th><th>Zona</th><th>Tienda</th><th>Vencimiento</th><th>Alerta</th></tr></thead><tbody>${
+    aten.map(r=>{
+      const d=r.dias;const dt=d===null?"Sin fecha":d<0?`Venció hace ${Math.abs(d)}d`:d===0?"⚠️ HOY":`${d} días`;
+      return`<tr><td><strong>${escCert(r.nombre)} ${escCert(r.apellido)}</strong></td><td>${escCert(r.cargo)}</td><td>${escCert(r.zona)}</td><td>${escCert(r.tienda)}</td>
+      <td>${certFecha(r.venc)}</td><td><span class="cert-badge ${r.est}">${CARNET_ALERTA[r.est]}</span> <span class="cert-dias ${r.est}">${dt}</span></td></tr>`;}).join("")}</tbody></table></div>`
+    :`<p style="color:#22c55e;font-size:.82rem;margin-bottom:18px">&#9989; Todos los carnets est&aacute;n vigentes (m&aacute;s de 15 d&iacute;as).</p>`);
+  body.innerHTML=`<div class="section-title">Estado general</div>
+    <div style="max-width:720px">${dashBar(s)}</div>${leyenda}${tZona}${tTienda}${tAten}`;
+};
+window.exportarDashCarnets=function(){
+  const rows=dashFiltrados();
+  if(!rows.length){alert("No hay carnets para exportar.");return;}
+  const est={vencido:"Vencido","proximo-7":"Por vencer (7 días)","proximo-15":"Por vencer (15 días)",vigente:"Vigente"};
+  const aoa=[["Zona","Tienda","Nombre","Apellido","Cargo","Vencimiento","Días restantes","Alerta"]]
+    .concat(rows.slice().sort((a,b)=>(a.dias??9999)-(b.dias??9999)).map(r=>[r.zona,r.tienda,r.nombre,r.apellido,r.cargo,r.venc||"",r.dias===null?"":r.dias,est[r.est]]));
+  const s=dashStats(rows);
+  const res=[["Indicador","Cantidad","Porcentaje"],["Total",s.t,"100%"],["Vigentes",s.ok,dashPct(s.ok,s.t)],["Por vencer (15 días o menos)",s.p7+s.p15,dashPct(s.p7+s.p15,s.t)],["Vencidos",s.v,dashPct(s.v,s.t)]];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(res),"Resumen");
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),"Carnets");
+  XLSX.writeFile(wb,`Carnets_sanidad_${new Date().toISOString().slice(0,10)}.xlsx`);
 };
 
 
